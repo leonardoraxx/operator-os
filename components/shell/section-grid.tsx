@@ -23,7 +23,7 @@ export function SectionGrid({
   gap = "md",
 }: SectionGridProps) {
   return (
-    <div className={cn("grid grid-cols-12", GAP[gap], className)}>
+    <div className={cn("grid grid-cols-12 items-start", GAP[gap], className)}>
       {children}
     </div>
   );
