@@ -54,6 +54,7 @@ export function QuickAddButton() {
             border: "1px solid var(--border-default)",
             boxShadow: "var(--shadow-floating)",
             color: "var(--text-primary)",
+            zIndex: 1000,
           }}
         >
           {ITEMS.map((item) => {

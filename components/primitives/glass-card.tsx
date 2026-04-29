@@ -126,7 +126,7 @@ export function GlassCard({
             />
           )}
           <h3
-            className="flex-1 text-card-title whitespace-nowrap"
+            className="flex-1 min-w-0 text-card-title truncate"
             style={{ color: "var(--text-muted)" }}
           >
             {header.title}
