@@ -7,37 +7,11 @@ import { StatusBadge } from "@/components/primitives/status-badge";
 import { formatCurrency } from "@/lib/format";
 import { getBusinesses } from "@/lib/db";
 
-const BUSINESSES_FALLBACK = [
-  {
-    id: "b1",
-    name: "South FL Suds",
-    tagline: "Premium eco cleaning products - direct & wholesale",
-    revenue: 1840,
-    mrr: 420,
-    status: "on-track" as const,
-    nextMilestone: "10 wholesale accounts by June 30",
-    employees: 1,
-    founded: "Jan 2026",
-  },
-  {
-    id: "b2",
-    name: "VenHQ",
-    tagline: "YouTube content brand - operators, founders, and builders",
-    revenue: 680,
-    mrr: 680,
-    status: "on-track" as const,
-    nextMilestone: "1,000 subscribers & monetization",
-    employees: 1,
-    founded: "Mar 2026",
-  },
-];
-
 export default async function BusinessesPage() {
-  const dbBusinesses = await getBusinesses();
-  const BUSINESSES = dbBusinesses.length > 0 ? dbBusinesses : BUSINESSES_FALLBACK;
-  const totalRevenue = BUSINESSES.reduce((s, b) => s + (b.revenue ?? 0), 0);
-  const totalMrr = BUSINESSES.reduce((s, b) => s + (b.mrr ?? 0), 0);
-  const activeCount = BUSINESSES.filter((b) => b.status === "on-track").length;
+  const businesses = await getBusinesses();
+  const totalRevenue = businesses.reduce((s, b) => s + (b.revenue ?? 0), 0);
+  const totalMrr = businesses.reduce((s, b) => s + (b.mrr ?? 0), 0);
+  const activeCount = businesses.filter((b) => b.status === "on-track").length;
 
   return (
     <PageContainer>
@@ -49,81 +23,93 @@ export default async function BusinessesPage() {
       <div className="space-y-4">
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <KPICard label="Ventures" value={BUSINESSES.length} />
-          <KPICard label="Revenue MTD" value={formatCurrency(totalRevenue)} delta="+12%" />
+          <KPICard label="Ventures" value={businesses.length} />
+          <KPICard label="Revenue MTD" value={formatCurrency(totalRevenue)} />
           <KPICard label="Est. MRR" value={formatCurrency(totalMrr)} />
           <KPICard
             label="Active"
             value={activeCount}
-            tone="success"
-            delta="All healthy"
+            tone={activeCount > 0 ? "success" : "neutral"}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {BUSINESSES.map((biz) => (
-            <GlassCard
-              key={biz.id}
-              header={{ icon: Building2, title: biz.name }}
-              footer="View details →"
-            >
-              <div className="space-y-4">
-                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                  {biz.tagline}
-                </p>
-
-                <div className="grid grid-cols-3 gap-3">
-                  <div
-                    className="rounded-xl p-2.5"
-                    style={{
-                      background: "var(--bg-glass-subtle)",
-                      border: "1px solid var(--border-subtle)",
-                    }}
-                  >
-                    <p className="text-xs" style={{ color: "var(--text-subtle)" }}>Revenue MTD</p>
-                    <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
-                      {formatCurrency(biz.revenue)}
-                    </p>
-                  </div>
-                  <div
-                    className="rounded-xl p-2.5"
-                    style={{
-                      background: "var(--bg-glass-subtle)",
-                      border: "1px solid var(--border-subtle)",
-                    }}
-                  >
-                    <p className="text-xs" style={{ color: "var(--text-subtle)" }}>Est. MRR</p>
-                    <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
-                      {formatCurrency(biz.mrr ?? 0)}
-                    </p>
-                  </div>
-                  <div
-                    className="rounded-xl p-2.5"
-                    style={{
-                      background: "var(--bg-glass-subtle)",
-                      border: "1px solid var(--border-subtle)",
-                    }}
-                  >
-                    <p className="text-xs" style={{ color: "var(--text-subtle)" }}>Status</p>
-                    <StatusBadge status={biz.status} />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs">
-                  <ArrowRight size={12} style={{ color: "var(--accent)", flexShrink: 0 }} />
-                  <p style={{ color: "var(--text-muted)" }}>
-                    <strong>Next:</strong> {biz.nextMilestone}
+        {businesses.length === 0 ? (
+          <div
+            className="rounded-2xl border-2 border-dashed p-12 text-center"
+            style={{ borderColor: "var(--border-default)", color: "var(--text-subtle)" }}
+          >
+            <Building2 size={32} className="mx-auto mb-3 opacity-30" />
+            <p className="text-sm font-medium">No businesses found</p>
+            <p className="text-xs mt-1">Add entries to the businesses table in Supabase.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {businesses.map((biz) => (
+              <GlassCard
+                key={biz.id}
+                header={{ icon: Building2, title: biz.name }}
+                footer="View details →"
+              >
+                <div className="space-y-4">
+                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                    {biz.tagline}
                   </p>
-                </div>
 
-                <div className="flex gap-4 text-xs" style={{ color: "var(--text-subtle)" }}>
-                  {biz.founded && <span>Founded {biz.founded}</span>}
-                  <span>{biz.employees === 1 ? "Solo" : `${biz.employees ?? 0} team`}</span>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div
+                      className="rounded-xl p-2.5"
+                      style={{
+                        background: "var(--bg-glass-subtle)",
+                        border: "1px solid var(--border-subtle)",
+                      }}
+                    >
+                      <p className="text-xs" style={{ color: "var(--text-subtle)" }}>Revenue MTD</p>
+                      <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+                        {formatCurrency(biz.revenue)}
+                      </p>
+                    </div>
+                    <div
+                      className="rounded-xl p-2.5"
+                      style={{
+                        background: "var(--bg-glass-subtle)",
+                        border: "1px solid var(--border-subtle)",
+                      }}
+                    >
+                      <p className="text-xs" style={{ color: "var(--text-subtle)" }}>Est. MRR</p>
+                      <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+                        {formatCurrency(biz.mrr ?? 0)}
+                      </p>
+                    </div>
+                    <div
+                      className="rounded-xl p-2.5"
+                      style={{
+                        background: "var(--bg-glass-subtle)",
+                        border: "1px solid var(--border-subtle)",
+                      }}
+                    >
+                      <p className="text-xs" style={{ color: "var(--text-subtle)" }}>Status</p>
+                      <StatusBadge status={biz.status} />
+                    </div>
+                  </div>
+
+                  {biz.nextMilestone && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <ArrowRight size={12} style={{ color: "var(--accent)", flexShrink: 0 }} />
+                      <p style={{ color: "var(--text-muted)" }}>
+                        <strong>Next:</strong> {biz.nextMilestone}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-4 text-xs" style={{ color: "var(--text-subtle)" }}>
+                    {biz.founded && <span>Founded {biz.founded}</span>}
+                    <span>{biz.employees === 1 ? "Solo" : `${biz.employees ?? 0} team`}</span>
+                  </div>
                 </div>
-              </div>
-            </GlassCard>
-          ))}
-        </div>
+              </GlassCard>
+            ))}
+          </div>
+        )}
       </div>
     </PageContainer>
   );

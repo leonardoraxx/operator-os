@@ -3,8 +3,16 @@ import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
 import { ScoreRing } from "@/components/primitives/score-ring";
+import { getDailyReview, getWeeklyReview } from "@/lib/db";
 
-export default function ReviewsPage() {
+export default async function ReviewsPage() {
+  const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  const [dailyEntries, weeklyReview] = await Promise.all([
+    getDailyReview(),
+    getWeeklyReview(),
+  ]);
+
   return (
     <PageContainer>
       <PageHeader
@@ -14,96 +22,105 @@ export default function ReviewsPage() {
       />
       <div className="space-y-4">
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <GlassCard
-            header={{ icon: Sun, title: "Daily Review - Apr 26" }}
+            header={{ icon: Sun, title: `Daily Review — ${today}` }}
             footer="Start today's review →"
           >
-            <div className="space-y-3">
-              {[
-                { q: "Top win today?", a: "Sent pricing to Miami Beach Naturals" },
-                { q: "What didn't get done?", a: "Coral Gables Co-op call, reschedule AM" },
-                { q: "Energy (1–10)?", a: "7" },
-                { q: "Improve tomorrow?", a: "Start outreach by 8 AM" },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl p-2.5"
-                  style={{
-                    background: "var(--bg-glass-subtle)",
-                    border: "1px solid var(--border-subtle)",
-                  }}
-                >
-                  <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
-                    {item.q}
-                  </p>
-                  <p className="text-sm mt-0.5" style={{ color: "var(--text-primary)" }}>
-                    {item.a}
-                  </p>
-                </div>
-              ))}
-            </div>
+            {dailyEntries.length === 0 ? (
+              <div className="text-center py-6" style={{ color: "var(--text-subtle)" }}>
+                <Sun size={28} className="mx-auto mb-2 opacity-30" />
+                <p className="text-sm font-medium">No review for today yet</p>
+                <p className="text-xs mt-1">Complete your daily closeout to populate this.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {dailyEntries.map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded-xl p-2.5"
+                    style={{
+                      background: "var(--bg-glass-subtle)",
+                      border: "1px solid var(--border-subtle)",
+                    }}
+                  >
+                    <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
+                      {item.prompt}
+                    </p>
+                    <p className="text-sm mt-0.5" style={{ color: "var(--text-primary)" }}>
+                      {item.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </GlassCard>
 
           <GlassCard
-            header={{ icon: CalendarDays, title: "Weekly Review - Wk 17" }}
+            header={{ icon: CalendarDays, title: "Weekly Review" }}
             footer="Start weekly review →"
           >
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                <ScoreRing value={78} size={80} label="score" />
+            {!weeklyReview ? (
+              <div className="text-center py-6" style={{ color: "var(--text-subtle)" }}>
+                <CalendarDays size={28} className="mx-auto mb-2 opacity-30" />
+                <p className="text-sm font-medium">No weekly review yet</p>
+                <p className="text-xs mt-1">Add a row to weekly_reviews for this ISO week.</p>
               </div>
-              <div className="space-y-2">
-                {[
-                  { label: "Focus sessions hit", value: "3/5" },
-                  { label: "Goals on track", value: "4/6" },
-                  { label: "Revenue vs target", value: "68%" },
-                  { label: "Content posted", value: "2/3" },
-                ].map((m, i) => (
-                  <div key={i} className="flex justify-between text-xs">
-                    <span style={{ color: "var(--text-muted)" }}>{m.label}</span>
-                    <span style={{ color: "var(--text-primary)" }}>{m.value}</span>
+            ) : (
+              <div className="space-y-4">
+                {weeklyReview.wins.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold mb-1.5" style={{ color: "var(--status-success)" }}>
+                      Wins
+                    </p>
+                    <ul className="space-y-1">
+                      {weeklyReview.wins.map((w, i) => (
+                        <li key={i} className="text-sm" style={{ color: "var(--text-primary)" }}>
+                          · {w}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                ))}
-              </div>
-            </div>
-          </GlassCard>
-
-          <GlassCard
-            header={{ icon: Archive, title: "Quarterly Review - Q1 2026" }}
-            footer="View full Q1 review →"
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                  Q1 Score
-                </p>
-                <ScoreRing value={71} size={56} />
-              </div>
-              <div className="space-y-2">
-                {[
-                  { label: "Goals completed", value: "3/5", positive: true },
-                  { label: "Revenue vs plan", value: "82%", positive: true },
-                  { label: "Sleep avg", value: "5.5h", positive: false },
-                  { label: "Content output", value: "14 pieces", positive: true },
-                ].map((m, i) => (
-                  <div key={i} className="flex justify-between text-xs">
-                    <span style={{ color: "var(--text-muted)" }}>{m.label}</span>
-                    <span
-                      style={{
-                        color: m.positive
-                          ? "var(--status-success)"
-                          : "var(--status-danger)",
-                      }}
-                    >
-                      {m.value}
-                    </span>
+                )}
+                {weeklyReview.losses.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold mb-1.5" style={{ color: "var(--status-danger)" }}>
+                      Missed
+                    </p>
+                    <ul className="space-y-1">
+                      {weeklyReview.losses.map((l, i) => (
+                        <li key={i} className="text-sm" style={{ color: "var(--text-primary)" }}>
+                          · {l}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                ))}
+                )}
+                {weeklyReview.nextMetric && (
+                  <div>
+                    <p className="text-xs font-semibold mb-1" style={{ color: "var(--accent)" }}>
+                      Next week focus
+                    </p>
+                    <p className="text-sm" style={{ color: "var(--text-primary)" }}>
+                      {weeklyReview.nextMetric}
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </GlassCard>
         </div>
+
+        <GlassCard
+          header={{ icon: Archive, title: "Quarterly Review" }}
+          footer="View full review →"
+        >
+          <div className="text-center py-6" style={{ color: "var(--text-subtle)" }}>
+            <Archive size={28} className="mx-auto mb-2 opacity-30" />
+            <p className="text-sm font-medium">Quarterly review not yet connected</p>
+            <p className="text-xs mt-1">Add quarterly_reviews table to Supabase to enable this.</p>
+          </div>
+        </GlassCard>
       </div>
     </PageContainer>
   );

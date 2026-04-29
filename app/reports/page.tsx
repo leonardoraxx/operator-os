@@ -1,24 +1,36 @@
-"use client";
-
 import { BarChart3 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
+import { KPICard } from "@/components/primitives/kpi-card";
 import { BarSpark } from "@/components/primitives/bar-spark";
 import { LineSpark } from "@/components/primitives/line-spark";
+import { getMoneyData, getActivityLogs } from "@/lib/db";
+import { formatCurrency } from "@/lib/format";
 
-const REVENUE_DATA = [
-  { day: "Jan", amount: 480 },
-  { day: "Feb", amount: 720 },
-  { day: "Mar", amount: 1240 },
-  { day: "Apr", amount: 1840 },
-];
+export default async function ReportsPage() {
+  const [money, activities] = await Promise.all([getMoneyData(), getActivityLogs()]);
 
-const OUTPUT_DATA = [8, 12, 9, 14, 11, 7, 13].map((y, x) => ({ x, y }));
-const FOCUS_DATA = [65, 70, 68, 75, 72, 80, 78].map((y, x) => ({ x, y }));
-const WEIGHT_DATA = [178.5, 179, 179.8, 180.2, 180.8, 181, 181.4].map((y, x) => ({ x, y }));
+  // Build revenue chart from cash flow series
+  const revenueSeries = money.cashFlowSeries.map((d) => ({
+    day: d.day,
+    amount: d.amount,
+  }));
 
-export default function ReportsPage() {
+  // Build output chart from activity logs (last 7 days by day count)
+  const now = new Date();
+  const outputByDay: Record<string, number> = {};
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    outputByDay[d.toISOString().slice(0, 10)] = 0;
+  }
+  for (const a of activities) {
+    const day = a.created_at.slice(0, 10);
+    if (day in outputByDay) outputByDay[day]++;
+  }
+  const outputSeries = Object.entries(outputByDay).map(([, count], x) => ({ x, y: count }));
+
   return (
     <PageContainer>
       <PageHeader
@@ -28,33 +40,54 @@ export default function ReportsPage() {
       />
       <div className="space-y-4">
 
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <KPICard label="Cash Available" value={formatCurrency(money.cashAvailable)} />
+          <KPICard label="Earned Today" value={formatCurrency(money.earnedToday)} />
+          <KPICard label="Expenses This Week" value={formatCurrency(money.expensesThisWeek)} />
+          <KPICard label="Activity (7d)" value={activities.length} />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <GlassCard header={{ icon: BarChart3, title: "Revenue MTD by Month" }}>
+          <GlassCard header={{ icon: BarChart3, title: "Cash Flow — This Week" }}>
             <p className="text-xs mb-3" style={{ color: "var(--text-subtle)" }}>
-              Combined across all income streams
+              Net daily cash flow from money_entries
             </p>
-            <BarSpark data={REVENUE_DATA} height={120} />
+            {revenueSeries.every((d) => d.amount === 0) ? (
+              <div className="text-center py-8" style={{ color: "var(--text-subtle)" }}>
+                <p className="text-sm">No money entries this week</p>
+              </div>
+            ) : (
+              <BarSpark data={revenueSeries} height={120} />
+            )}
           </GlassCard>
 
-          <GlassCard header={{ icon: BarChart3, title: "Daily Output (Tasks/Day)" }}>
+          <GlassCard header={{ icon: BarChart3, title: "Daily Output (Activity Logs)" }}>
             <p className="text-xs mb-3" style={{ color: "var(--text-subtle)" }}>
-              Last 7 days - target: 12+
+              Last 7 days — entries in activity_logs
             </p>
-            <LineSpark data={OUTPUT_DATA} height={100} />
+            {outputSeries.every((d) => d.y === 0) ? (
+              <div className="text-center py-8" style={{ color: "var(--text-subtle)" }}>
+                <p className="text-sm">No activity logged yet</p>
+              </div>
+            ) : (
+              <LineSpark data={outputSeries} height={100} />
+            )}
           </GlassCard>
 
           <GlassCard header={{ icon: BarChart3, title: "Focus Score Trend" }}>
-            <p className="text-xs mb-3" style={{ color: "var(--text-subtle)" }}>
-              Last 7 days - current: 78
-            </p>
-            <LineSpark data={FOCUS_DATA} height={100} />
+            <div className="text-center py-8" style={{ color: "var(--text-subtle)" }}>
+              <BarChart3 size={28} className="mx-auto mb-3 opacity-30" />
+              <p className="text-sm font-medium">No score trend data</p>
+              <p className="text-xs mt-1">Add focus_score entries to daily_reviews over time.</p>
+            </div>
           </GlassCard>
 
-          <GlassCard header={{ icon: BarChart3, title: "Body Weight Trend (lbs)" }}>
-            <p className="text-xs mb-3" style={{ color: "var(--text-subtle)" }}>
-              Last 7 days - target: 196 lbs
-            </p>
-            <LineSpark data={WEIGHT_DATA} height={100} />
+          <GlassCard header={{ icon: BarChart3, title: "Body Weight Trend" }}>
+            <div className="text-center py-8" style={{ color: "var(--text-subtle)" }}>
+              <BarChart3 size={28} className="mx-auto mb-3 opacity-30" />
+              <p className="text-sm font-medium">No weight data</p>
+              <p className="text-xs mt-1">Add a fitness_logs table to track body weight over time.</p>
+            </div>
           </GlassCard>
         </div>
       </div>

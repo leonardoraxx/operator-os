@@ -1,121 +1,104 @@
-import { Dumbbell, Moon, Beef, Scale } from "lucide-react";
+import { Dumbbell, Scale } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
 import { KPICard } from "@/components/primitives/kpi-card";
+import { ProgressBar } from "@/components/primitives/progress-bar";
+import { getActiveGoals } from "@/lib/db";
 
-const WEEK_DAYS = [
-  { day: "Mon", workout: "Push", done: true },
-  { day: "Tue", workout: "Rest", done: true },
-  { day: "Wed", workout: "Pull", done: true },
-  { day: "Thu", workout: "Legs", done: false },
-  { day: "Fri", workout: "Push", done: false },
-  { day: "Sat", workout: "Rest", done: false },
-  { day: "Sun", workout: "Active recovery", done: false },
-];
+export default async function FitnessPage() {
+  const goals = await getActiveGoals();
+  const fitnessGoal = goals.find(
+    (g) => g.category === "health" || /body|weight|fitness|bulk/i.test(g.title)
+  );
 
-const WORKOUT_LOG = [
-  { id: "w1", date: "Apr 25 (Wed)", type: "Pull", duration: "58m", notes: "Rows 4×8 @185lb PR, pull-ups 5×8" },
-  { id: "w2", date: "Apr 24 (Tue)", type: "Rest", duration: "-", notes: "8h sleep, 3100 kcal, 182g protein" },
-  { id: "w3", date: "Apr 23 (Mon)", type: "Push", duration: "52m", notes: "Bench 4×5 @195lb, shoulder press 3×10" },
-];
+  const currentWeight = fitnessGoal ? fitnessGoal.current : null;
+  const targetWeight = fitnessGoal ? fitnessGoal.target : null;
+  const weightUnit = fitnessGoal?.unit ?? "lbs";
+  const weightProgress = fitnessGoal ? fitnessGoal.progress : 0;
 
-export default function FitnessPage() {
   return (
     <PageContainer>
       <PageHeader
-        eyebrow="Week 17"
+        eyebrow="Body composition"
         title="Fitness"
-        subtitle="Body composition and training log"
+        subtitle="Training log and body composition goals"
       />
       <div className="space-y-4">
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <KPICard
-            icon={Scale}
-            label="Current Weight"
-            value="181 lbs"
-            delta="+0.8 lbs · target: 196"
-          />
-          <KPICard
-            icon={Moon}
-            label="Avg Sleep"
-            value="5h 52m"
-            tone="warning"
-            delta="Below target"
-          />
-          <KPICard icon={Beef} label="Protein Today" value="184g" delta="Target: 200g" />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {currentWeight != null ? (
+            <KPICard
+              icon={Scale}
+              label="Current Weight"
+              value={`${currentWeight} ${weightUnit}`}
+              delta={targetWeight != null ? `target: ${targetWeight} ${weightUnit}` : undefined}
+            />
+          ) : (
+            <KPICard icon={Scale} label="Current Weight" value="—" delta="No data" />
+          )}
           <KPICard
             icon={Dumbbell}
-            label="Sessions This Week"
-            value="3/4"
-            tone="success"
-            delta="On track"
+            label="Goal Progress"
+            value={`${weightProgress}%`}
+            tone={weightProgress >= 75 ? "success" : weightProgress >= 40 ? "warning" : "neutral"}
           />
+          {fitnessGoal && (
+            <KPICard
+              label="Goal"
+              value={fitnessGoal.title}
+              tone={fitnessGoal.status === "on-track" ? "success" : "warning"}
+            />
+          )}
         </div>
 
-        <GlassCard header={{ icon: Dumbbell, title: "This Week" }}>
-          <div className="grid grid-cols-7 gap-2">
-            {WEEK_DAYS.map((d) => (
-              <div
-                key={d.day}
-                className="flex flex-col items-center gap-1.5 py-3 rounded-xl"
-                style={{
-                  background: d.done ? "var(--status-success-bg)" : "var(--bg-glass-subtle)",
-                  border: d.done
-                    ? "1px solid var(--status-success)"
-                    : "1px solid var(--border-subtle)",
-                  opacity: d.done ? 1 : 0.7,
-                }}
-              >
-                <p
-                  className="text-xs font-semibold"
-                  style={{
-                    color: d.done ? "var(--status-success)" : "var(--text-muted)",
-                  }}
-                >
-                  {d.day}
-                </p>
-                <p className="text-xs text-center" style={{ color: "var(--text-subtle)" }}>
-                  {d.workout}
-                </p>
-                {d.done && (
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ background: "var(--status-success)" }}
-                  />
-                )}
+        {fitnessGoal ? (
+          <GlassCard header={{ icon: Scale, title: fitnessGoal.title }}>
+            <div className="space-y-4">
+              <div className="flex justify-between text-sm">
+                <span style={{ color: "var(--text-muted)" }}>
+                  {currentWeight} {weightUnit} current
+                </span>
+                <span style={{ color: "var(--text-muted)" }}>
+                  {targetWeight} {weightUnit} target
+                </span>
               </div>
-            ))}
-          </div>
-        </GlassCard>
+              <ProgressBar value={weightProgress} showLabel />
+              {fitnessGoal.nextAction && (
+                <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
+                  Next: {fitnessGoal.nextAction}
+                </p>
+              )}
+              {fitnessGoal.deadline && (
+                <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
+                  Deadline: {fitnessGoal.deadline}
+                </p>
+              )}
+            </div>
+          </GlassCard>
+        ) : (
+          <GlassCard header={{ icon: Scale, title: "Body Composition Goal" }}>
+            <div
+              className="rounded-xl p-8 text-center"
+              style={{ color: "var(--text-subtle)" }}
+            >
+              <Scale size={28} className="mx-auto mb-3 opacity-30" />
+              <p className="text-sm font-medium">No fitness goal found</p>
+              <p className="text-xs mt-1">
+                Add a goal with category "fitness" or "health" to operator_goals.
+              </p>
+            </div>
+          </GlassCard>
+        )}
 
-        <GlassCard header={{ icon: Dumbbell, title: "Workout Log" }} footer="View full log →">
-          <div className="space-y-3">
-            {WORKOUT_LOG.map((w) => (
-              <div
-                key={w.id}
-                className="rounded-xl p-3"
-                style={{
-                  background: "var(--bg-glass-subtle)",
-                  border: "1px solid var(--border-subtle)",
-                }}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                    {w.date} - {w.type}
-                  </p>
-                  {w.duration !== "-" && (
-                    <span className="text-xs" style={{ color: "var(--accent)" }}>
-                      {w.duration}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                  {w.notes}
-                </p>
-              </div>
-            ))}
+        <GlassCard header={{ icon: Dumbbell, title: "Workout Log" }}>
+          <div
+            className="rounded-xl p-8 text-center"
+            style={{ color: "var(--text-subtle)" }}
+          >
+            <Dumbbell size={28} className="mx-auto mb-3 opacity-30" />
+            <p className="text-sm font-medium">No workout log connected</p>
+            <p className="text-xs mt-1">Log workouts to a fitness_logs table to see history here.</p>
           </div>
         </GlassCard>
       </div>

@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OperatorOS",
+  title: "Homebase",
   description: "Founder-grade command center",
 };
 

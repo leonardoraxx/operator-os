@@ -75,7 +75,7 @@ export function MobileSidebar({ operator }: Props = {}) {
                 className="text-sm font-semibold tracking-tight"
                 style={{ color: "var(--text-primary)" }}
               >
-                OperatorOS
+                Homebase
               </span>
             </div>
 

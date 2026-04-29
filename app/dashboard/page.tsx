@@ -97,7 +97,7 @@ export default async function DashboardPage() {
           <TodaysMission mission={mission} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-3">
-          <DailyCommand />
+          <DailyCommand tasks={todayTasks} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
           <MoneySnapshot money={money} />
