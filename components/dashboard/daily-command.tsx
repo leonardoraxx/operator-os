@@ -48,7 +48,7 @@ export function DailyCommand({ tasks = [] }: Props) {
                     {i + 1}
                   </span>
                   <span
-                    className="text-small truncate"
+                    className="text-small min-w-0 truncate"
                     style={{
                       color: "var(--text-primary)",
                       textDecoration: task.done ? "line-through" : undefined,
