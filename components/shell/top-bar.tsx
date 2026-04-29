@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { SearchBar } from "./search-bar";
 import { QuickAddButton } from "./quick-add-button";
 import { MobileSidebar } from "./mobile-sidebar";
@@ -13,6 +14,7 @@ interface TopBarProps {
 }
 
 export function TopBar({ breadcrumb, notificationCount = 3, operator }: TopBarProps) {
+  const router = useRouter();
   return (
     <header
       className="flex items-center gap-3 px-4 lg:px-6 flex-shrink-0 h-[56px] md:h-[60px] lg:h-[64px]"
@@ -68,7 +70,7 @@ export function TopBar({ breadcrumb, notificationCount = 3, operator }: TopBarPr
       {/* Right: notifications + Quick Add */}
       <div className="ml-auto md:ml-0 flex items-center gap-1.5">
         <button
-          onClick={() => console.log("[TopBar] notifications")}
+          onClick={() => router.push("/agent-inbox")}
           className="relative w-9 h-9 flex items-center justify-center rounded-lg outline-none"
           style={{
             color: "var(--text-secondary)",
