@@ -3,6 +3,7 @@
 import { Target } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
 import { RingProgress } from "@/components/primitives/ring-progress";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import type { DataListItem } from "@/components/primitives/data-list";
 import type { Goal } from "@/data/types";
 
@@ -34,7 +35,7 @@ export function ActiveGoals({ goals = [] }: Props) {
       pill={{ label: `${goals.length}`, color: "neutral" }}
       items={items}
       density="comfortable"
-      footer="View goals →"
+      footer={<CardFooterLink href="/goals" label="View goals →" />}
     />
   );
 }

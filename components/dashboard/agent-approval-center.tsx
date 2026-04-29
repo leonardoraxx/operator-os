@@ -2,6 +2,7 @@
 
 import { Bot, Check, X } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import { formatRelative } from "@/lib/format";
 import { useState } from "react";
 import type { AgentTask } from "@/data/types";
@@ -27,7 +28,7 @@ export function AgentApprovalCenter({ initialTasks = [] }: Props) {
             ? { label: `${pending} pending`, color: "warning" }
             : undefined,
       }}
-      footer="View full inbox →"
+      footer={<CardFooterLink href="/agent-inbox" label="View full inbox →" />}
       padding="md"
     >
       {tasks.length === 0 ? (

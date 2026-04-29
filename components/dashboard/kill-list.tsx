@@ -14,7 +14,7 @@ export function KillList({ items: propItems = [] }: Props) {
     iconColor: "var(--text-secondary)",
     title: k.title,
     meta: k.reason,
-    impact: { label: `+${k.timeSaved}`, tone: "success" },
+    impact: k.timeSaved ? { label: `+${k.timeSaved}`, tone: "success" } : undefined,
     group: "KILLED",
   }));
 

@@ -1,5 +1,6 @@
 import { Moon } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import type { CloseoutEntry } from "@/lib/db";
 
 interface Props {
@@ -10,7 +11,7 @@ export function DailyCloseout({ items }: Props) {
   return (
     <GlassCard
       header={{ icon: Moon, title: "Daily Closeout" }}
-      footer="Start closeout →"
+      footer={<CardFooterLink href="/reviews" label="Start closeout →" />}
       padding="md"
     >
       <div className="flex flex-col gap-3">

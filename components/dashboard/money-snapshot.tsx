@@ -2,6 +2,7 @@ import { DollarSign, Wallet, TrendingUp, Calendar, Receipt } from "lucide-react"
 import { GlassCard } from "@/components/primitives/glass-card";
 import { MetricCard } from "@/components/primitives/metric-card";
 import { BarSpark } from "@/components/primitives/bar-spark";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import { formatCurrency } from "@/lib/format";
 import type { MoneyData } from "@/lib/db";
 
@@ -20,7 +21,7 @@ export function MoneySnapshot({ money }: Props) {
   return (
     <GlassCard
       header={{ icon: DollarSign, title: "Money Snapshot" }}
-      footer="View money →"
+      footer={<CardFooterLink href="/money" label="View money →" />}
       padding="md"
     >
       <div className="flex flex-col gap-3 flex-1">

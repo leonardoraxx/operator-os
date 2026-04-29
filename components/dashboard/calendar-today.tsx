@@ -1,5 +1,6 @@
 import { Calendar, Check } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import type { OperatorTask } from "@/lib/db";
 
 interface Props {
@@ -32,7 +33,7 @@ export function CalendarToday({ tasks }: Props) {
         title: "Today",
         pill: { label: `${remaining} left`, color: "neutral" },
       }}
-      footer="Full calendar →"
+      footer={<CardFooterLink href="/calendar" label="Full calendar →" />}
       padding="sm"
     >
       {tasks.length === 0 ? (

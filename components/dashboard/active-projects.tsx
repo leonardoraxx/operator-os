@@ -3,6 +3,7 @@
 import { FolderKanban } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
 import { RingProgress } from "@/components/primitives/ring-progress";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import type { DataListItem } from "@/components/primitives/data-list";
 import type { Project } from "@/data/types";
 
@@ -16,7 +17,7 @@ export function ActiveProjects({ projects = [] }: Props) {
   const items: DataListItem[] = data.map((p) => ({
     id: p.id,
     title: p.title,
-    meta: `${p.business} · ${p.tasks ? `${p.tasks.done}/${p.tasks.total} tasks` : p.category}`,
+    meta: [p.business, p.tasks ? `${p.tasks.done}/${p.tasks.total} tasks` : p.category].filter(Boolean).join(" · "),
     trailing: (
       <RingProgress
         value={p.progress}
@@ -34,7 +35,7 @@ export function ActiveProjects({ projects = [] }: Props) {
       pill={{ label: `${data.length}`, color: "neutral" }}
       items={items}
       density="comfortable"
-      footer="View projects →"
+      footer={<CardFooterLink href="/projects" label="View projects →" />}
     />
   );
 }

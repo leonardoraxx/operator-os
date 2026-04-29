@@ -86,7 +86,7 @@ export default async function DashboardPage() {
         title="Dashboard"
         subtitle={
           operator
-            ? `${operator.name} · ${operator.role}`
+            ? `${operator.name} · Homebase`
             : "Your operator console"
         }
       />

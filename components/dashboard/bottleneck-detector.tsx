@@ -20,9 +20,9 @@ const SEVERITY_ORDER: Record<string, number> = {
 };
 
 export function BottleneckDetector({ bottlenecks }: Props) {
-  const sorted = [...bottlenecks].sort(
-    (a, b) => (SEVERITY_ORDER[a.impact] ?? 2) - (SEVERITY_ORDER[b.impact] ?? 2),
-  );
+  const sorted = [...bottlenecks]
+    .sort((a, b) => (SEVERITY_ORDER[a.impact] ?? 2) - (SEVERITY_ORDER[b.impact] ?? 2))
+    .slice(0, 6);
 
   const items: DataListItem[] = sorted.map((b) => ({
     id: b.id,
@@ -44,7 +44,7 @@ export function BottleneckDetector({ bottlenecks }: Props) {
     <ListSection
       title="Bottlenecks"
       icon={AlertCircle}
-      pill={{ label: `${bottlenecks.length}`, color: "warning" }}
+      pill={{ label: bottlenecks.length > 6 ? `${sorted.length} of ${bottlenecks.length}` : `${bottlenecks.length}`, color: "warning" }}
       items={items}
       density="comfortable"
       footer="View all →"

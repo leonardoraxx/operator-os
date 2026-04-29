@@ -27,8 +27,8 @@ export function OutputTracker({ activities }: Props) {
     id: a.id,
     icon: iconForType(a.target_type),
     iconColor: "var(--text-secondary)",
-    title: a.detail?.title ?? a.action,
-    meta: a.detail?.platform ?? a.actor,
+    title: a.action,
+    meta: a.detail?.note ?? a.target_type ?? "",
     trailing: (
       <span
         className="text-tiny tabular-nums flex-shrink-0"
