@@ -1,0 +1,15 @@
+{
+  "sectors": [{"key":"life","display_name":"Life","description":"Personal life, health, relationships, home.","accent":"#7c9eff","created_at":"2026-04-18T23:09:05.084426+00:00"}, 
+ {"key":"business","display_name":"Business","description":"Ventures, products, revenue, operations.","accent":"#ffb86b","created_at":"2026-04-18T23:09:05.084426+00:00"}, 
+ {"key":"religion","display_name":"Religion","description":"Faith, spiritual practice, study, devotion.","accent":"#c792ea","created_at":"2026-04-18T23:09:05.084426+00:00"}, 
+ {"key":"future","display_name":"Future","description":"Long-horizon vision, strategic bets, unknowns.","accent":"#7ee8b8","created_at":"2026-04-18T23:09:05.084426+00:00"}],
+  "systems": [{"id":"45b04316-68c2-45fb-beb7-f23693e8989b","name":"staffingos","display_name":"StaffingOS","type":"app","sector":"business","purpose":"Staffing operations platform. Operational truth lives in its own DB.","status":"active","live_url":null,"repo_url":null,"deployment_provider":"render","database_provider":"supabase","notes":"Independent production app. Homebase references it strategically; does not absorb its DB.","created_at":"2026-04-18T23:09:08.75773+00:00","updated_at":"2026-04-18T23:09:08.75773+00:00"}, 
+ {"id":"905369bf-dbd4-4d2e-9077-b5484ea83fd5","name":"journalos","display_name":"JournalOS","type":"app","sector":"business","purpose":"Trading journal + achievements engine. Operational truth lives in its own DB.","status":"active","live_url":null,"repo_url":null,"deployment_provider":"render","database_provider":"supabase","notes":"Independent production app. Homebase references it strategically; does not absorb its DB.","created_at":"2026-04-18T23:09:08.75773+00:00","updated_at":"2026-04-18T23:09:08.75773+00:00"}, 
+ {"id":"451836c7-524e-4400-8fab-b140460123e9","name":"homebase","display_name":"Homebase","type":"app","sector":"life","purpose":"This app. Personal command center — control, knowledge, coordination.","status":"active","live_url":null,"repo_url":null,"deployment_provider":"render","database_provider":"supabase","notes":"You are here.","created_at":"2026-04-18T23:09:08.75773+00:00","updated_at":"2026-04-18T23:09:08.75773+00:00"}],
+  "projects": [{"id":"605b316d-6512-40d7-aa09-26270f425c0d","title":"Test","description":"Tes","sector":"life","system_id":null,"goal_id":null,"status":"planning","priority":3,"notes":null,"created_at":"2026-04-21T16:34:43.358324+00:00","updated_at":"2026-04-21T16:34:43.358324+00:00"}],
+  "graph_entities": [{"kind":"systems","id":"45b04316-68c2-45fb-beb7-f23693e8989b","label":"StaffingOS","sector":"business"}, 
+ {"kind":"systems","id":"905369bf-dbd4-4d2e-9077-b5484ea83fd5","label":"JournalOS","sector":"business"}, 
+ {"kind":"systems","id":"451836c7-524e-4400-8fab-b140460123e9","label":"Homebase","sector":"life"}, 
+ {"kind":"projects","id":"605b316d-6512-40d7-aa09-26270f425c0d","label":"Test","sector":"life"}],
+  "_meta": { "backed_up_at": "2026-04-29T03:34:06Z" }
+}

@@ -5,8 +5,9 @@ import { GlassCard } from "@/components/primitives/glass-card";
 import { KPICard } from "@/components/primitives/kpi-card";
 import { StatusBadge } from "@/components/primitives/status-badge";
 import { formatCurrency } from "@/lib/format";
+import { getBusinesses } from "@/lib/db";
 
-const BUSINESSES = [
+const BUSINESSES_FALLBACK = [
   {
     id: "b1",
     name: "South FL Suds",
@@ -17,7 +18,6 @@ const BUSINESSES = [
     nextMilestone: "10 wholesale accounts by June 30",
     employees: 1,
     founded: "Jan 2026",
-    category: "CPG / Wholesale",
   },
   {
     id: "b2",
@@ -29,13 +29,14 @@ const BUSINESSES = [
     nextMilestone: "1,000 subscribers & monetization",
     employees: 1,
     founded: "Mar 2026",
-    category: "Content / Media",
   },
 ];
 
-export default function BusinessesPage() {
-  const totalRevenue = BUSINESSES.reduce((s, b) => s + b.revenue, 0);
-  const totalMrr = BUSINESSES.reduce((s, b) => s + b.mrr, 0);
+export default async function BusinessesPage() {
+  const dbBusinesses = await getBusinesses();
+  const BUSINESSES = dbBusinesses.length > 0 ? dbBusinesses : BUSINESSES_FALLBACK;
+  const totalRevenue = BUSINESSES.reduce((s, b) => s + (b.revenue ?? 0), 0);
+  const totalMrr = BUSINESSES.reduce((s, b) => s + (b.mrr ?? 0), 0);
   const activeCount = BUSINESSES.filter((b) => b.status === "on-track").length;
 
   return (
@@ -93,7 +94,7 @@ export default function BusinessesPage() {
                   >
                     <p className="text-xs" style={{ color: "var(--text-subtle)" }}>Est. MRR</p>
                     <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
-                      {formatCurrency(biz.mrr)}
+                      {formatCurrency(biz.mrr ?? 0)}
                     </p>
                   </div>
                   <div
@@ -116,9 +117,8 @@ export default function BusinessesPage() {
                 </div>
 
                 <div className="flex gap-4 text-xs" style={{ color: "var(--text-subtle)" }}>
-                  <span>Founded {biz.founded}</span>
-                  <span>{biz.category}</span>
-                  <span>{biz.employees === 1 ? "Solo" : `${biz.employees} team`}</span>
+                  {biz.founded && <span>Founded {biz.founded}</span>}
+                  <span>{biz.employees === 1 ? "Solo" : `${biz.employees ?? 0} team`}</span>
                 </div>
               </div>
             </GlassCard>

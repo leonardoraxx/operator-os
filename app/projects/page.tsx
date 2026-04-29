@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/primitives/status-badge";
 import { ProgressBar } from "@/components/primitives/progress-bar";
 import { ACTIVE_PROJECTS } from "@/data/dashboard";
 import type { Project } from "@/data/types";
+import { getProjects } from "@/lib/db";
 
 const ALL_PROJECTS: Project[] = [
   ...ACTIVE_PROJECTS,
@@ -51,7 +52,9 @@ const COLUMNS: { id: Project["column"]; label: string }[] = [
   { id: "done", label: "Done" },
 ];
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const dbProjects = await getProjects();
+  const PROJECTS = dbProjects.length > 0 ? dbProjects : ALL_PROJECTS;
   return (
     <PageContainer>
       <PageHeader
@@ -63,7 +66,7 @@ export default function ProjectsPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 overflow-x-auto">
           {COLUMNS.map((col) => {
-            const colProjects = ALL_PROJECTS.filter(
+            const colProjects = PROJECTS.filter(
               (p) => p.column === col.id || (!p.column && col.id === "active"),
             );
             return (

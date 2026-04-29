@@ -7,8 +7,12 @@ import { formatRelative } from "@/lib/format";
 import { useState } from "react";
 import type { AgentTask } from "@/data/types";
 
-export function AgentApprovalCenter() {
-  const [tasks, setTasks] = useState<AgentTask[]>(AGENT_TASKS);
+interface Props { initialTasks?: AgentTask[] }
+
+export function AgentApprovalCenter({ initialTasks }: Props = {}) {
+  const [tasks, setTasks] = useState<AgentTask[]>(
+    initialTasks && initialTasks.length > 0 ? initialTasks : AGENT_TASKS,
+  );
 
   function setStatus(id: string, status: AgentTask["status"]) {
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));

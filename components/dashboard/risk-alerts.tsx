@@ -5,6 +5,7 @@ import { ListSection } from "@/components/primitives/list-section";
 import { RiskBadge } from "@/components/primitives/risk-badge";
 import { RISK_ALERTS } from "@/data/dashboard";
 import type { DataListItem } from "@/components/primitives/data-list";
+import type { RiskAlert } from "@/data/types";
 
 const CATEGORY_ICON: Record<string, typeof AlertTriangle> = {
   sleep: Moon,
@@ -13,8 +14,11 @@ const CATEGORY_ICON: Record<string, typeof AlertTriangle> = {
   tilt: TrendingDown,
 };
 
-export function RiskAlerts() {
-  const items: DataListItem[] = RISK_ALERTS.map((alert) => {
+interface Props { alerts?: RiskAlert[] }
+
+export function RiskAlerts({ alerts }: Props = {}) {
+  const data = alerts && alerts.length > 0 ? alerts : RISK_ALERTS;
+  const items: DataListItem[] = data.map((alert) => {
     const Icon = CATEGORY_ICON[alert.category] ?? AlertTriangle;
     const tone =
       alert.level === "high" || alert.level === "elevated" ? "danger" : "warning";
@@ -37,7 +41,7 @@ export function RiskAlerts() {
     <ListSection
       title="Risk Alerts"
       icon={AlertTriangle}
-      pill={{ label: `${RISK_ALERTS.length}`, color: "danger" }}
+      pill={{ label: `${data.length}`, color: "danger" }}
       items={items}
       density="comfortable"
       footer="View all →"

@@ -5,11 +5,15 @@ import { ListSection } from "@/components/primitives/list-section";
 import { RingProgress } from "@/components/primitives/ring-progress";
 import { ACTIVE_GOALS } from "@/data/goals";
 import type { DataListItem } from "@/components/primitives/data-list";
+import type { Goal } from "@/data/types";
 
-export function ActiveGoals() {
-  const goals = ACTIVE_GOALS.slice(0, 4);
+interface Props { goals?: Goal[] }
+
+export function ActiveGoals({ goals: propGoals }: Props = {}) {
+  const data = propGoals && propGoals.length > 0 ? propGoals : ACTIVE_GOALS;
+  const goals = data.slice(0, 4);
   const focusedId =
-    (ACTIVE_GOALS.find((g) => g.priority === "critical") ?? ACTIVE_GOALS[0]).id;
+    (data.find((g) => g.priority === "critical") ?? data[0])?.id ?? "";
 
   const items: DataListItem[] = goals.map((g) => ({
     id: g.id,
@@ -29,7 +33,7 @@ export function ActiveGoals() {
     <ListSection
       title="Active Goals"
       icon={Target}
-      pill={{ label: `${ACTIVE_GOALS.length}`, color: "neutral" }}
+      pill={{ label: `${data.length}`, color: "neutral" }}
       items={items}
       density="comfortable"
       footer="View goals →"

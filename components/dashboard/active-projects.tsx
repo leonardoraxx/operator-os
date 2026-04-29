@@ -5,12 +5,16 @@ import { ListSection } from "@/components/primitives/list-section";
 import { RingProgress } from "@/components/primitives/ring-progress";
 import { ACTIVE_PROJECTS } from "@/data/dashboard";
 import type { DataListItem } from "@/components/primitives/data-list";
+import type { Project } from "@/data/types";
 
-export function ActiveProjects() {
+interface Props { projects?: Project[] }
+
+export function ActiveProjects({ projects }: Props = {}) {
+  const data = projects && projects.length > 0 ? projects : ACTIVE_PROJECTS;
   const focusedId =
-    (ACTIVE_PROJECTS.find((p) => p.priority === "high") ?? ACTIVE_PROJECTS[0]).id;
+    (data.find((p) => p.priority === "high") ?? data[0])?.id ?? "";
 
-  const items: DataListItem[] = ACTIVE_PROJECTS.map((p) => ({
+  const items: DataListItem[] = data.map((p) => ({
     id: p.id,
     title: p.title,
     meta: `${p.business} · ${p.tasks ? `${p.tasks.done}/${p.tasks.total} tasks` : p.category}`,
@@ -28,7 +32,7 @@ export function ActiveProjects() {
     <ListSection
       title="Active Projects"
       icon={FolderKanban}
-      pill={{ label: `${ACTIVE_PROJECTS.length}`, color: "neutral" }}
+      pill={{ label: `${data.length}`, color: "neutral" }}
       items={items}
       density="comfortable"
       footer="View projects →"

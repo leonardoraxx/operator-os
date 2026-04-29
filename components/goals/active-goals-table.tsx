@@ -9,10 +9,13 @@ import { ACTIVE_GOALS } from "@/data/goals";
 import { formatDate } from "@/lib/format";
 import type { Goal } from "@/data/types";
 
-export function ActiveGoalsTable() {
+interface Props { goals?: Goal[] }
+
+export function ActiveGoalsTable({ goals }: Props = {}) {
+  const data = goals && goals.length > 0 ? goals : ACTIVE_GOALS;
   // Determine focused goal — the one HeroCard features. Only that row gets accent progress.
   const focusedId =
-    (ACTIVE_GOALS.find((g) => g.priority === "critical") ?? ACTIVE_GOALS[0]).id;
+    (data.find((g) => g.priority === "critical") ?? data[0])?.id ?? "";
 
   const columns: DataTableColumn<Goal>[] = [
     {
@@ -97,7 +100,7 @@ export function ActiveGoalsTable() {
       header={{
         icon: Table2,
         title: "Active Goals",
-        pill: { label: `${ACTIVE_GOALS.length}`, color: "neutral" },
+        pill: { label: `${data.length}`, color: "neutral" },
       }}
       footer="View all goals →"
       padding="none"
@@ -105,7 +108,7 @@ export function ActiveGoalsTable() {
       <div className="px-2 py-1">
         <DataTable
           columns={columns}
-          rows={ACTIVE_GOALS}
+          rows={data}
           mobileVariant="stacked"
           rowActions={(row) => (
             <button

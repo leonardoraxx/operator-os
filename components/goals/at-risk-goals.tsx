@@ -4,7 +4,7 @@ import { ShieldAlert, AlertTriangle } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
 import { RiskBadge } from "@/components/primitives/risk-badge";
 import { ACTIVE_GOALS } from "@/data/goals";
-import type { RiskLevel } from "@/data/types";
+import type { Goal, RiskLevel } from "@/data/types";
 import type { DataListItem } from "@/components/primitives/data-list";
 
 const STATUS_RISK: Record<string, RiskLevel> = {
@@ -12,8 +12,11 @@ const STATUS_RISK: Record<string, RiskLevel> = {
   behind: "high",
 };
 
-export function AtRiskGoals() {
-  const atRisk = ACTIVE_GOALS.filter(
+interface Props { goals?: Goal[] }
+
+export function AtRiskGoals({ goals }: Props = {}) {
+  const data = goals && goals.length > 0 ? goals : ACTIVE_GOALS;
+  const atRisk = data.filter(
     (g) => g.status === "at-risk" || g.status === "behind",
   );
 

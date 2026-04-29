@@ -29,12 +29,15 @@ const CATEGORY_DOT: Record<string, string> = {
   personal: "var(--text-secondary)",
 };
 
-export function PriorityMatrix() {
+interface Props { goals?: Goal[] }
+
+export function PriorityMatrix({ goals }: Props = {}) {
+  const data = goals && goals.length > 0 ? goals : ACTIVE_GOALS;
   const quadrants = QUADRANT_KEYS.map((key): MatrixQuadrant => {
-    const goals = ACTIVE_GOALS.filter((g) => g.quadrant === key);
+    const inQuad = data.filter((g) => g.quadrant === key);
     return {
       label: QUADRANT_LABELS[key],
-      chips: goals.map((g) => ({
+      chips: inQuad.map((g) => ({
         id: g.id,
         label: g.title,
         dotColor: CATEGORY_DOT[g.category],

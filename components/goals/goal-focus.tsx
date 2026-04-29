@@ -5,6 +5,7 @@ import { HeroCard } from "@/components/primitives/hero-card";
 import { ProgressBar } from "@/components/primitives/progress-bar";
 import { ACTIVE_GOALS } from "@/data/goals";
 import { formatCurrency, formatDate } from "@/lib/format";
+import type { Goal } from "@/data/types";
 
 const PRIORITY_LABEL: Record<string, string> = {
   critical: "P0 · Critical",
@@ -13,9 +14,13 @@ const PRIORITY_LABEL: Record<string, string> = {
   low: "P3 · Low",
 };
 
-export function GoalFocus() {
+interface Props { goals?: Goal[] }
+
+export function GoalFocus({ goals }: Props = {}) {
+  const data = goals && goals.length > 0 ? goals : ACTIVE_GOALS;
   // Feature the most critical goal
-  const goal = ACTIVE_GOALS.find((g) => g.priority === "critical") ?? ACTIVE_GOALS[0];
+  const goal = data.find((g) => g.priority === "critical") ?? data[0];
+  if (!goal) return null;
 
   const isAtRisk = goal.status === "at-risk" || goal.status === "behind";
   const currentLabel =

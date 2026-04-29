@@ -19,20 +19,58 @@ import { OpportunityQueue } from "@/components/dashboard/opportunity-queue";
 import { DecisionLog } from "@/components/dashboard/decision-log";
 import { KillList } from "@/components/dashboard/kill-list";
 import { AgentApprovalCenter } from "@/components/dashboard/agent-approval-center";
+import {
+  getActiveGoals,
+  getProjects,
+  getRiskAlerts,
+  getKillItems,
+  getAgentTasks,
+  getTodaysMission,
+  getOperator,
+} from "@/lib/db";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [
+    goals,
+    projects,
+    alerts,
+    killItems,
+    agentTasks,
+    mission,
+    operator,
+  ] = await Promise.all([
+    getActiveGoals(),
+    getProjects(),
+    getRiskAlerts(),
+    getKillItems(),
+    getAgentTasks(),
+    getTodaysMission(),
+    getOperator(),
+  ]);
+
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <PageContainer>
       <PageHeader
-        eyebrow="Tuesday, April 28, 2026"
+        eyebrow={today}
         title="Dashboard"
-        subtitle="Your operator console"
+        subtitle={
+          operator
+            ? `${operator.name} · ${operator.role}`
+            : "Your operator console"
+        }
       />
 
       {/* Row 1 — Status: Mission dominates, then Command + Money */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 xl:col-span-5">
-          <TodaysMission />
+          <TodaysMission mission={mission} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-3">
           <DailyCommand />
@@ -45,7 +83,7 @@ export default function DashboardPage() {
       {/* Row 2 — Risk + Calendar + Output Tracker */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <RiskAlerts />
+          <RiskAlerts alerts={alerts} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
           <CalendarToday />
@@ -58,10 +96,10 @@ export default function DashboardPage() {
       {/* Row 3 — Execution: Goals + Projects + Bottlenecks */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <ActiveGoals />
+          <ActiveGoals goals={goals} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <ActiveProjects />
+          <ActiveProjects projects={projects} />
         </div>
         <div className="col-span-12 xl:col-span-4">
           <BottleneckDetector />
@@ -79,8 +117,8 @@ export default function DashboardPage() {
         <div className="col-span-12 md:col-span-6 xl:col-span-3 grid grid-cols-1 gap-4">
           <MoneyRunway />
           <div className="grid grid-cols-2 gap-4">
-            <ExecutionScore />
-            <FocusScore />
+            <ExecutionScore score={operator?.executionScore} />
+            <FocusScore score={operator?.focusScore} />
           </div>
         </div>
       </SectionGrid>
@@ -94,13 +132,13 @@ export default function DashboardPage() {
           <DecisionLog />
         </div>
         <div className="col-span-12 xl:col-span-4">
-          <KillList />
+          <KillList items={killItems} />
         </div>
       </SectionGrid>
 
       {/* Row 6 — Agent Approval Center (full width) */}
       <div>
-        <AgentApprovalCenter />
+        <AgentApprovalCenter initialTasks={agentTasks} />
       </div>
     </PageContainer>
   );

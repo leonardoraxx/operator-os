@@ -4,9 +4,12 @@ import { Check, Circle, ArrowRight } from "lucide-react";
 import { HeroCard } from "@/components/primitives/hero-card";
 import { ProgressBar } from "@/components/primitives/progress-bar";
 import { TODAYS_MISSION } from "@/data/dashboard";
+import type { Mission } from "@/data/types";
 
-export function TodaysMission() {
-  const mission = TODAYS_MISSION;
+interface Props { mission?: Mission | null }
+
+export function TodaysMission({ mission: propMission }: Props = {}) {
+  const mission = propMission ?? TODAYS_MISSION;
   const doneCount = mission.actions.filter((a) => a.done).length;
   const total = mission.actions.length;
   const progress = Math.round((doneCount / total) * 100);

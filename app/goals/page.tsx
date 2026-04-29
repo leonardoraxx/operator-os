@@ -11,10 +11,17 @@ import { PriorityMatrix } from "@/components/goals/priority-matrix";
 import { RecentProgress } from "@/components/goals/recent-progress";
 import { QuarterlyReview } from "@/components/goals/quarterly-review";
 import { ACTIVE_GOALS, COMPLETED_GOALS_QTD } from "@/data/goals";
+import { getActiveGoals, getCompletedGoals } from "@/lib/db";
 
-export default function GoalsPage() {
-  const onTrack = ACTIVE_GOALS.filter((g) => g.status === "on-track").length;
-  const atRisk = ACTIVE_GOALS.filter(
+export default async function GoalsPage() {
+  const [dbActive, dbCompleted] = await Promise.all([
+    getActiveGoals(),
+    getCompletedGoals(),
+  ]);
+  const goals = dbActive.length > 0 ? dbActive : ACTIVE_GOALS;
+  const completed = dbCompleted.length > 0 ? dbCompleted : COMPLETED_GOALS_QTD;
+  const onTrack = goals.filter((g) => g.status === "on-track").length;
+  const atRisk = goals.filter(
     (g) => g.status === "at-risk" || g.status === "behind",
   ).length;
 
@@ -28,11 +35,11 @@ export default function GoalsPage() {
 
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-5 2xl:gap-6 mb-5">
-        <KPICard label="Active Goals" value={ACTIVE_GOALS.length} delta="This quarter" />
+        <KPICard label="Active Goals" value={goals.length} delta="This quarter" />
         <KPICard
           label="On Track"
           value={onTrack}
-          delta={`${onTrack} of ${ACTIVE_GOALS.length}`}
+          delta={`${onTrack} of ${goals.length}`}
           tone="success"
         />
         <KPICard
@@ -43,7 +50,7 @@ export default function GoalsPage() {
         />
         <KPICard
           label="Completed QTD"
-          value={COMPLETED_GOALS_QTD.length}
+          value={completed.length}
           delta="This quarter"
         />
       </div>
@@ -51,20 +58,20 @@ export default function GoalsPage() {
       {/* Goal Focus + Categories */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 lg:col-span-8">
-          <GoalFocus />
+          <GoalFocus goals={goals} />
         </div>
         <div className="col-span-12 sm:col-span-6 lg:col-span-4">
-          <GoalCategories />
+          <GoalCategories goals={goals} />
         </div>
       </SectionGrid>
 
       {/* Active Goals Table + At Risk */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 lg:col-span-8">
-          <ActiveGoalsTable />
+          <ActiveGoalsTable goals={goals} />
         </div>
         <div className="col-span-12 sm:col-span-6 lg:col-span-4">
-          <AtRiskGoals />
+          <AtRiskGoals goals={goals} />
         </div>
       </SectionGrid>
 
@@ -74,7 +81,7 @@ export default function GoalsPage() {
           <MilestoneTimeline />
         </div>
         <div className="col-span-12 sm:col-span-6 lg:col-span-5">
-          <PriorityMatrix />
+          <PriorityMatrix goals={goals} />
         </div>
       </SectionGrid>
 
