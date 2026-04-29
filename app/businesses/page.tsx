@@ -4,6 +4,7 @@ import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
 import { KPICard } from "@/components/primitives/kpi-card";
 import { StatusBadge } from "@/components/primitives/status-badge";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import { formatCurrency } from "@/lib/format";
 import { getBusinesses } from "@/lib/db";
 
@@ -48,7 +49,7 @@ export default async function BusinessesPage() {
               <GlassCard
                 key={biz.id}
                 header={{ icon: Building2, title: biz.name }}
-                footer="View details →"
+                footer={<CardFooterLink href={`/businesses/${biz.id}`} label="View details →" />}
               >
                 <div className="space-y-4">
                   <p className="text-sm" style={{ color: "var(--text-secondary)" }}>

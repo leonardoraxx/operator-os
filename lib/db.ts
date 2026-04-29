@@ -137,6 +137,23 @@ type BusinessRow = {
   next_action: string | null;
 };
 
+function mapBusiness(r: BusinessRow): Business {
+  return {
+    id: r.id,
+    name: r.name,
+    tagline: r.description ?? "",
+    revenue: Number(r.revenue ?? 0),
+    expenses: Number(r.expenses ?? 0),
+    status: (r.status === "active" ? "on-track" : r.status === "paused" ? "paused" : "on-track") as Business["status"],
+    nextMilestone: r.next_action ?? "",
+    bottleneck: r.current_bottleneck ?? "",
+    type: r.type ?? "",
+    mrr: undefined,
+    employees: undefined,
+    founded: undefined,
+  };
+}
+
 export async function getBusinesses(): Promise<Business[]> {
   const rows = await safeQuery(
     () =>
@@ -146,17 +163,21 @@ export async function getBusinesses(): Promise<Business[]> {
         .order("name", { ascending: true }),
     [] as BusinessRow[]
   );
-  return rows.map((r) => ({
-    id: r.id,
-    name: r.name,
-    tagline: r.description ?? "",
-    revenue: Number(r.revenue ?? 0),
-    status: (r.status === "active" ? "on-track" : r.status === "paused" ? "paused" : "on-track") as Business["status"],
-    nextMilestone: r.next_action ?? r.current_bottleneck ?? "",
-    mrr: undefined,
-    employees: undefined,
-    founded: undefined,
-  }));
+  return rows.map(mapBusiness);
+}
+
+export async function getBusinessById(id: string): Promise<Business | null> {
+  const row = await safeQuery(
+    () =>
+      supabaseServer
+        .from("businesses")
+        .select("id,name,type,status,description,revenue,expenses,current_bottleneck,next_action")
+        .eq("id", id)
+        .maybeSingle(),
+    null
+  );
+  if (!row) return null;
+  return mapBusiness(row);
 }
 
 // ── Projects — uses operator_projects ───────────────────────────────

@@ -54,9 +54,12 @@ export interface Business {
   id: string;
   name: string;
   tagline: string;
+  type?: string;
   revenue: number;
+  expenses?: number;
   status: StatusType;
   nextMilestone: string;
+  bottleneck?: string;
   mrr?: number;
   employees?: number;
   founded?: string;
