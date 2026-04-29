@@ -1,6 +1,10 @@
 import { Swords } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
-import { WEEKLY_WAR_ROOM } from "@/data/dashboard";
+import type { WeeklyReviewData } from "@/lib/db";
+
+interface Props {
+  review: WeeklyReviewData | null;
+}
 
 interface PanelProps {
   label: string;
@@ -32,9 +36,9 @@ function Panel({ label, dotColor, items, paragraph }: PanelProps) {
         >
           {paragraph}
         </p>
-      ) : (
+      ) : items && items.length > 0 ? (
         <ul className="flex flex-col gap-1">
-          {items?.map((it, i) => (
+          {items.map((it, i) => (
             <li
               key={i}
               className="text-tiny leading-snug"
@@ -44,13 +48,18 @@ function Panel({ label, dotColor, items, paragraph }: PanelProps) {
             </li>
           ))}
         </ul>
+      ) : (
+        <p className="text-tiny" style={{ color: "var(--text-muted)" }}>
+          Nothing logged yet
+        </p>
       )}
     </div>
   );
 }
 
-export function WeeklyWarRoom() {
-  const data = WEEKLY_WAR_ROOM;
+export function WeeklyWarRoom({ review }: Props) {
+  const data = review ?? { wins: [], losses: [], nextMetric: "", doubleDown: "" };
+
   return (
     <GlassCard header={{ icon: Swords, title: "Weekly War Room" }} padding="md">
       <div className="grid grid-cols-2 gap-3">
@@ -59,12 +68,12 @@ export function WeeklyWarRoom() {
         <Panel
           label="Next Metric"
           dotColor="var(--accent)"
-          paragraph={data.nextMetric}
+          paragraph={data.nextMetric || "Not set"}
         />
         <Panel
           label="Double Down"
           dotColor="var(--status-warning)"
-          paragraph={data.doubleDown}
+          paragraph={data.doubleDown || "Not set"}
         />
       </div>
     </GlassCard>

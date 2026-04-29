@@ -3,12 +3,14 @@ import {
   TimelineSection,
   type TimelineItem,
 } from "@/components/primitives/timeline-section";
-import { ACTIVE_GOALS } from "@/data/goals";
 import { formatDate } from "@/lib/format";
+import type { Goal } from "@/data/types";
 
-export function MilestoneTimeline() {
+interface Props { goals?: Goal[] }
+
+export function MilestoneTimeline({ goals = [] }: Props) {
   // Flatten across active goals, sort by due date asc, take next 8.
-  const flattened = ACTIVE_GOALS.filter((g) => g.milestones && g.milestones.length > 0)
+  const flattened = goals.filter((g) => g.milestones && g.milestones.length > 0)
     .flatMap((g) =>
       (g.milestones ?? []).map((m) => ({ ...m, goalTitle: g.title })),
     )

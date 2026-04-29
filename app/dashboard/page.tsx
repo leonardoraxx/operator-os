@@ -27,6 +27,14 @@ import {
   getAgentTasks,
   getTodaysMission,
   getOperator,
+  getDecisions,
+  getOpportunities,
+  getWeeklyReview,
+  getDailyReview,
+  getActivityLogs,
+  getOperatorContext,
+  getMoneyData,
+  getTodayTasks,
 } from "@/lib/db";
 
 export default async function DashboardPage() {
@@ -38,6 +46,14 @@ export default async function DashboardPage() {
     agentTasks,
     mission,
     operator,
+    decisions,
+    opportunities,
+    weeklyReview,
+    dailyReview,
+    activities,
+    bottlenecks,
+    money,
+    todayTasks,
   ] = await Promise.all([
     getActiveGoals(),
     getProjects(),
@@ -46,6 +62,14 @@ export default async function DashboardPage() {
     getAgentTasks(),
     getTodaysMission(),
     getOperator(),
+    getDecisions(),
+    getOpportunities(),
+    getWeeklyReview(),
+    getDailyReview(),
+    getActivityLogs(),
+    getOperatorContext(),
+    getMoneyData(),
+    getTodayTasks(),
   ]);
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -76,7 +100,7 @@ export default async function DashboardPage() {
           <DailyCommand />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <MoneySnapshot />
+          <MoneySnapshot money={money} />
         </div>
       </SectionGrid>
 
@@ -86,10 +110,10 @@ export default async function DashboardPage() {
           <RiskAlerts alerts={alerts} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <CalendarToday />
+          <CalendarToday tasks={todayTasks} />
         </div>
         <div className="col-span-12 xl:col-span-4">
-          <OutputTracker />
+          <OutputTracker activities={activities} />
         </div>
       </SectionGrid>
 
@@ -102,20 +126,20 @@ export default async function DashboardPage() {
           <ActiveProjects projects={projects} />
         </div>
         <div className="col-span-12 xl:col-span-4">
-          <BottleneckDetector />
+          <BottleneckDetector bottlenecks={bottlenecks} />
         </div>
       </SectionGrid>
 
       {/* Row 4 — Week + Closeout + Runway/Scores */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 xl:col-span-5">
-          <WeeklyWarRoom />
+          <WeeklyWarRoom review={weeklyReview} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <DailyCloseout />
+          <DailyCloseout items={dailyReview} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-3 grid grid-cols-1 gap-4">
-          <MoneyRunway />
+          <MoneyRunway money={money} />
           <div className="grid grid-cols-2 gap-4">
             <ExecutionScore score={operator?.executionScore} />
             <FocusScore score={operator?.focusScore} />
@@ -126,10 +150,10 @@ export default async function DashboardPage() {
       {/* Row 5 — Queues */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <OpportunityQueue />
+          <OpportunityQueue opportunities={opportunities} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <DecisionLog />
+          <DecisionLog decisions={decisions} />
         </div>
         <div className="col-span-12 xl:col-span-4">
           <KillList items={killItems} />

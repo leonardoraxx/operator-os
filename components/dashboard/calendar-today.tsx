@@ -1,6 +1,10 @@
 import { Calendar, Check } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
-import { CALENDAR_TODAY } from "@/data/dashboard";
+import type { OperatorTask } from "@/lib/db";
+
+interface Props {
+  tasks: OperatorTask[];
+}
 
 const CATEGORY_COLORS: Record<string, string> = {
   business: "var(--text-secondary)",
@@ -8,10 +12,18 @@ const CATEGORY_COLORS: Record<string, string> = {
   content: "var(--text-secondary)",
   system: "var(--text-subtle)",
   finance: "var(--text-secondary)",
+  personal: "var(--accent)",
 };
 
-export function CalendarToday() {
-  const remaining = CALENDAR_TODAY.filter((e) => !e.done).length;
+const PRIORITY_COLORS: Record<string, string> = {
+  critical: "var(--status-danger)",
+  high: "var(--status-warning)",
+  medium: "var(--text-secondary)",
+  low: "var(--text-subtle)",
+};
+
+export function CalendarToday({ tasks }: Props) {
+  const remaining = tasks.filter((t) => !t.done).length;
 
   return (
     <GlassCard
@@ -23,56 +35,54 @@ export function CalendarToday() {
       footer="Full calendar →"
       padding="sm"
     >
-      <ul className="flex flex-col">
-        {CALENDAR_TODAY.map((event) => (
-          <li
-            key={event.id}
-            className="flex items-center gap-3 px-2 py-2 rounded-md"
-            style={{ opacity: event.done ? 0.55 : 1 }}
-          >
-            <span
-              className="text-tiny tabular-nums w-12 flex-shrink-0"
-              style={{
-                color: "var(--text-muted)",
-                fontFamily:
-                  "var(--font-geist-mono), ui-monospace, monospace",
-              }}
+      {tasks.length === 0 ? (
+        <p className="px-2 py-3 text-small" style={{ color: "var(--text-muted)" }}>
+          No tasks due today.
+        </p>
+      ) : (
+        <ul className="flex flex-col">
+          {tasks.map((task) => (
+            <li
+              key={task.id}
+              className="flex items-center gap-3 px-2 py-2 rounded-md"
+              style={{ opacity: task.done ? 0.55 : 1 }}
             >
-              {event.time}
-            </span>
-            <span
-              className="w-1 h-7 rounded-full flex-shrink-0"
-              style={{
-                background:
-                  CATEGORY_COLORS[event.category] ?? "var(--text-subtle)",
-              }}
-            />
-            <div className="flex-1 min-w-0">
-              <p
-                className="text-[13px] truncate"
+              <span
+                className="w-1 h-7 rounded-full flex-shrink-0"
                 style={{
-                  color: "var(--text-primary)",
-                  textDecoration: event.done ? "line-through" : undefined,
+                  background:
+                    PRIORITY_COLORS[task.priority] ??
+                    CATEGORY_COLORS[task.category] ??
+                    "var(--text-subtle)",
                 }}
-              >
-                {event.title}
-              </p>
-              <p
-                className="text-tiny truncate"
-                style={{ color: "var(--text-muted)" }}
-              >
-                {event.duration}
-              </p>
-            </div>
-            {event.done && (
-              <Check
-                size={14}
-                style={{ color: "var(--status-success)", flexShrink: 0 }}
               />
-            )}
-          </li>
-        ))}
-      </ul>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-[13px] truncate"
+                  style={{
+                    color: "var(--text-primary)",
+                    textDecoration: task.done ? "line-through" : undefined,
+                  }}
+                >
+                  {task.title}
+                </p>
+                <p
+                  className="text-tiny truncate"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {task.category} · {task.priority}
+                </p>
+              </div>
+              {task.done && (
+                <Check
+                  size={14}
+                  style={{ color: "var(--status-success)", flexShrink: 0 }}
+                />
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </GlassCard>
   );
 }

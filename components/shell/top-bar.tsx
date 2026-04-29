@@ -4,13 +4,15 @@ import { Bell } from "lucide-react";
 import { SearchBar } from "./search-bar";
 import { QuickAddButton } from "./quick-add-button";
 import { MobileSidebar } from "./mobile-sidebar";
+import type { Operator } from "@/data/types";
 
 interface TopBarProps {
   breadcrumb?: string;
   notificationCount?: number;
+  operator?: Operator | null;
 }
 
-export function TopBar({ breadcrumb, notificationCount = 3 }: TopBarProps) {
+export function TopBar({ breadcrumb, notificationCount = 3, operator }: TopBarProps) {
   return (
     <header
       className="flex items-center gap-3 px-4 lg:px-6 flex-shrink-0 h-[56px] md:h-[60px] lg:h-[64px]"
@@ -23,7 +25,7 @@ export function TopBar({ breadcrumb, notificationCount = 3 }: TopBarProps) {
     >
       {/* Left: hamburger (mobile) + env indicator + breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
-        <MobileSidebar />
+        <MobileSidebar operator={operator} />
         <div className="hidden lg:flex items-center gap-2">
           <span
             className="w-1.5 h-1.5 rounded-full"

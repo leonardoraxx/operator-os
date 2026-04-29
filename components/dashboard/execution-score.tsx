@@ -1,13 +1,13 @@
 import { Flame } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
 import { ScoreRing } from "@/components/primitives/score-ring";
-import { OPERATOR } from "@/data/operator";
 import type { Score } from "@/data/types";
+
+const EMPTY_SCORE: Score = { value: 0, delta: 0, sparkline: [], label: "Execution Score" };
 
 interface Props { score?: Score }
 
-export function ExecutionScore({ score: propScore }: Props = {}) {
-  const score = propScore ?? OPERATOR.executionScore;
+export function ExecutionScore({ score = EMPTY_SCORE }: Props) {
   const tone = score.value >= 80 ? "accent" : "neutral";
 
   return (

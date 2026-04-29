@@ -1,13 +1,15 @@
 "use client";
 
-import { OPERATOR } from "@/data/operator";
 import { LineSpark } from "@/components/primitives/line-spark";
 import { useMounted } from "@/hooks/use-mounted";
 import { ThemeToggle } from "./theme-toggle";
+import type { Operator } from "@/data/types";
 
-export function OperatorCard() {
+interface Props { operator?: Operator | null }
+
+export function OperatorCard({ operator }: Props = {}) {
   const mounted = useMounted();
-  const op = OPERATOR;
+  const op = operator ?? { name: "Operator", role: "—", handle: "", focusScore: { value: 0, delta: 0, sparkline: [], label: "Focus" }, executionScore: { value: 0, delta: 0, sparkline: [], label: "Execution" } };
   const accentDelta = op.focusScore.delta >= 5;
 
   return (

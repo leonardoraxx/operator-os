@@ -4,46 +4,8 @@ import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
 import { StatusBadge } from "@/components/primitives/status-badge";
 import { ProgressBar } from "@/components/primitives/progress-bar";
-import { ACTIVE_PROJECTS } from "@/data/dashboard";
 import type { Project } from "@/data/types";
 import { getProjects } from "@/lib/db";
-
-const ALL_PROJECTS: Project[] = [
-  ...ACTIVE_PROJECTS,
-  {
-    id: "proj4",
-    title: "Wholesale Pitch Deck",
-    business: "South FL Suds",
-    category: "Sales",
-    progress: 90,
-    status: "on-track",
-    priority: "high",
-    column: "review",
-    tasks: { total: 6, done: 5 },
-  },
-  {
-    id: "proj5",
-    title: "YouTube Channel Art Refresh",
-    business: "VenHQ",
-    category: "Content",
-    progress: 100,
-    status: "done",
-    priority: "low",
-    column: "done",
-    tasks: { total: 4, done: 4 },
-  },
-  {
-    id: "proj6",
-    title: "Product Photography Session",
-    business: "South FL Suds",
-    category: "Marketing",
-    progress: 0,
-    status: "paused",
-    priority: "medium",
-    column: "backlog",
-    tasks: { total: 8, done: 0 },
-  },
-];
 
 const COLUMNS: { id: Project["column"]; label: string }[] = [
   { id: "backlog", label: "Backlog" },
@@ -53,8 +15,7 @@ const COLUMNS: { id: Project["column"]; label: string }[] = [
 ];
 
 export default async function ProjectsPage() {
-  const dbProjects = await getProjects();
-  const PROJECTS = dbProjects.length > 0 ? dbProjects : ALL_PROJECTS;
+  const PROJECTS = await getProjects();
   return (
     <PageContainer>
       <PageHeader

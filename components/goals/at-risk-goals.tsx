@@ -3,7 +3,6 @@
 import { ShieldAlert, AlertTriangle } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
 import { RiskBadge } from "@/components/primitives/risk-badge";
-import { ACTIVE_GOALS } from "@/data/goals";
 import type { Goal, RiskLevel } from "@/data/types";
 import type { DataListItem } from "@/components/primitives/data-list";
 
@@ -14,8 +13,8 @@ const STATUS_RISK: Record<string, RiskLevel> = {
 
 interface Props { goals?: Goal[] }
 
-export function AtRiskGoals({ goals }: Props = {}) {
-  const data = goals && goals.length > 0 ? goals : ACTIVE_GOALS;
+export function AtRiskGoals({ goals = [] }: Props) {
+  const data = goals;
   const atRisk = data.filter(
     (g) => g.status === "at-risk" || g.status === "behind",
   );

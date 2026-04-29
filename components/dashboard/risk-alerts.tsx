@@ -3,7 +3,6 @@
 import { AlertTriangle, Moon, Activity, DollarSign, TrendingDown } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
 import { RiskBadge } from "@/components/primitives/risk-badge";
-import { RISK_ALERTS } from "@/data/dashboard";
 import type { DataListItem } from "@/components/primitives/data-list";
 import type { RiskAlert } from "@/data/types";
 
@@ -16,8 +15,8 @@ const CATEGORY_ICON: Record<string, typeof AlertTriangle> = {
 
 interface Props { alerts?: RiskAlert[] }
 
-export function RiskAlerts({ alerts }: Props = {}) {
-  const data = alerts && alerts.length > 0 ? alerts : RISK_ALERTS;
+export function RiskAlerts({ alerts = [] }: Props) {
+  const data = alerts;
   const items: DataListItem[] = data.map((alert) => {
     const Icon = CATEGORY_ICON[alert.category] ?? AlertTriangle;
     const tone =

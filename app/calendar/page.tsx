@@ -1,41 +1,51 @@
-"use client";
-
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
-import { CALENDAR_TODAY } from "@/data/dashboard";
+import { getTodayTasks, getAllTasks } from "@/lib/db";
 
 const WEEK_DAYS_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
-const WEEK_EVENTS = [
-  { day: 0, hour: 9, title: "Deep Work - Suds outreach", duration: 2, color: "var(--accent)" },
-  { day: 0, hour: 11, title: "VenHQ product call", duration: 1, color: "var(--status-warning)" },
-  { day: 0, hour: 15, title: "Record YT long-form", duration: 2, color: "var(--status-danger)" },
-  { day: 1, hour: 10, title: "Investor check-in", duration: 1, color: "var(--status-warning)" },
-  { day: 2, hour: 9, title: "Deep Work block", duration: 2, color: "var(--accent)" },
-  { day: 2, hour: 14, title: "Content batch", duration: 3, color: "var(--status-danger)" },
-  { day: 4, hour: 9, title: "Weekly review", duration: 1, color: "var(--status-success)" },
-];
-
-const CATEGORY_COLORS: Record<string, string> = {
-  business: "var(--accent)",
-  health: "var(--status-success)",
-  content: "var(--status-warning)",
+const PRIORITY_COLORS: Record<string, string> = {
+  critical: "var(--status-danger)",
+  high: "var(--status-warning)",
+  medium: "var(--accent)",
+  low: "var(--status-success)",
 };
 
-export default function CalendarPage() {
+function getISOWeek(date: Date): number {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+}
+
+export default async function CalendarPage() {
+  const [todayTasks, allTasks] = await Promise.all([
+    getTodayTasks(),
+    getAllTasks(),
+  ]);
+
+  const now = new Date();
+  const dayOfWeek = (now.getDay() + 6) % 7;
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - dayOfWeek);
+
+  const todayLabel = now.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+  const weekEnd = new Date(weekStart.getTime() + 6 * 86400000);
+  const weekLabel = `${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+
   return (
     <PageContainer>
       <PageHeader
-        eyebrow="Week 17"
+        eyebrow={`Week ${getISOWeek(now)}`}
         title="Calendar"
-        subtitle="Week of April 21–27, 2026"
+        subtitle={`Week of ${weekLabel}`}
         actions={
           <div className="flex items-center gap-2">
             <button
-              onClick={() => console.log("[Calendar] prev week")}
               className="p-1.5 rounded-lg"
               aria-label="Previous week"
               style={{
@@ -47,7 +57,6 @@ export default function CalendarPage() {
               <ChevronLeft size={14} />
             </button>
             <button
-              onClick={() => console.log("[Calendar] next week")}
               className="p-1.5 rounded-lg"
               aria-label="Next week"
               style={{
@@ -63,42 +72,46 @@ export default function CalendarPage() {
       />
       <div className="space-y-4">
 
-        <GlassCard header={{ icon: Calendar, title: "Today - April 26" }}>
-          <div className="space-y-2">
-            {CALENDAR_TODAY.map((event) => (
-              <div
-                key={event.id}
-                className="flex items-center gap-3 p-2.5 rounded-xl"
-                style={{
-                  background: event.done ? "var(--bg-glass-subtle)" : "var(--bg-glass-subtle)",
-                  border: "1px solid var(--border-subtle)",
-                  opacity: event.done ? 0.6 : 1,
-                }}
-              >
+        <GlassCard header={{ icon: Calendar, title: `Today — ${todayLabel}` }}>
+          {todayTasks.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>No tasks scheduled for today.</p>
+          ) : (
+            <div className="space-y-2">
+              {todayTasks.map((task) => (
                 <div
-                  className="w-1 rounded-full flex-shrink-0"
+                  key={task.id}
+                  className="flex items-center gap-3 p-2.5 rounded-xl"
                   style={{
-                    height: 36,
-                    background: CATEGORY_COLORS[event.category] ?? "var(--text-subtle)",
+                    background: "var(--bg-glass-subtle)",
+                    border: "1px solid var(--border-subtle)",
+                    opacity: task.done ? 0.6 : 1,
                   }}
-                />
-                <div>
-                  <p
-                    className="text-sm font-medium"
+                >
+                  <div
+                    className="w-1 rounded-full flex-shrink-0"
                     style={{
-                      color: "var(--text-primary)",
-                      textDecoration: event.done ? "line-through" : undefined,
+                      height: 36,
+                      background: PRIORITY_COLORS[task.priority] ?? "var(--text-subtle)",
                     }}
-                  >
-                    {event.title}
-                  </p>
-                  <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
-                    {event.time} · {event.duration}
-                  </p>
+                  />
+                  <div>
+                    <p
+                      className="text-sm font-medium"
+                      style={{
+                        color: "var(--text-primary)",
+                        textDecoration: task.done ? "line-through" : undefined,
+                      }}
+                    >
+                      {task.title}
+                    </p>
+                    <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
+                      {task.category} · {task.priority}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </GlassCard>
 
         <GlassCard header={{ icon: Calendar, title: "Week View" }} padding="none">
@@ -112,24 +125,28 @@ export default function CalendarPage() {
                 }}
               >
                 <div className="p-2" />
-                {WEEK_DAYS_HEADERS.map((day, i) => (
-                  <div
-                    key={day}
-                    className="p-2 text-center text-xs font-semibold"
-                    style={{
-                      color: i === 6 ? "var(--accent)" : "var(--text-muted)",
-                      borderLeft: "1px solid var(--border-subtle)",
-                    }}
-                  >
-                    {day}
+                {WEEK_DAYS_HEADERS.map((day, i) => {
+                  const d = new Date(weekStart);
+                  d.setDate(weekStart.getDate() + i);
+                  return (
                     <div
-                      className="text-lg font-medium mt-0.5"
-                      style={{ color: i === 6 ? "var(--accent)" : "var(--text-primary)" }}
+                      key={day}
+                      className="p-2 text-center text-xs font-semibold"
+                      style={{
+                        color: i === dayOfWeek ? "var(--accent)" : "var(--text-muted)",
+                        borderLeft: "1px solid var(--border-subtle)",
+                      }}
                     >
-                      {21 + i}
+                      {day}
+                      <div
+                        className="text-lg font-medium mt-0.5"
+                        style={{ color: i === dayOfWeek ? "var(--accent)" : "var(--text-primary)" }}
+                      >
+                        {d.getDate()}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               {HOURS.map((hour) => (
                 <div
@@ -148,25 +165,29 @@ export default function CalendarPage() {
                     {hour}:00
                   </div>
                   {WEEK_DAYS_HEADERS.map((_, di) => {
-                    const evt = WEEK_EVENTS.find((e) => e.day === di && e.hour === hour);
+                    const d = new Date(weekStart);
+                    d.setDate(weekStart.getDate() + di);
+                    const dateStr = d.toISOString().slice(0, 10);
+                    const dayTasks = hour === 9 ? allTasks.filter((t) => t.due_date === dateStr) : [];
                     return (
                       <div
                         key={di}
                         className="relative p-1"
                         style={{ borderLeft: "1px solid var(--border-subtle)" }}
                       >
-                        {evt && (
+                        {dayTasks.map((t) => (
                           <div
-                            className="rounded-lg px-2 py-1.5 text-xs font-medium"
+                            key={t.id}
+                            className="rounded-lg px-2 py-1.5 text-xs font-medium mb-1"
                             style={{
-                              background: `color-mix(in srgb, ${evt.color} 12%, transparent)`,
-                              borderLeft: `2px solid ${evt.color}`,
-                              color: evt.color,
+                              background: `color-mix(in srgb, ${PRIORITY_COLORS[t.priority] ?? "var(--text-subtle)"} 12%, transparent)`,
+                              borderLeft: `2px solid ${PRIORITY_COLORS[t.priority] ?? "var(--text-subtle)"}`,
+                              color: PRIORITY_COLORS[t.priority] ?? "var(--text-subtle)",
                             }}
                           >
-                            {evt.title}
+                            {t.title}
                           </div>
-                        )}
+                        ))}
                       </div>
                     );
                   })}

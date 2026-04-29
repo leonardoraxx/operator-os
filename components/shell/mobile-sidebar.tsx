@@ -4,8 +4,11 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Menu, X } from "lucide-react";
 import { SidebarNav } from "./sidebar-nav";
 import { OperatorCard } from "./operator-card";
+import type { Operator } from "@/data/types";
 
-export function MobileSidebar() {
+interface Props { operator?: Operator | null }
+
+export function MobileSidebar({ operator }: Props = {}) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
@@ -102,7 +105,7 @@ export function MobileSidebar() {
             className="flex-shrink-0 px-3 pt-3 pb-4"
             style={{ borderTop: "1px solid var(--border-subtle)" }}
           >
-            <OperatorCard />
+            <OperatorCard operator={operator} />
           </div>
         </Dialog.Content>
       </Dialog.Portal>

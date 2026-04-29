@@ -10,16 +10,15 @@ import { MilestoneTimeline } from "@/components/goals/milestone-timeline";
 import { PriorityMatrix } from "@/components/goals/priority-matrix";
 import { RecentProgress } from "@/components/goals/recent-progress";
 import { QuarterlyReview } from "@/components/goals/quarterly-review";
-import { ACTIVE_GOALS, COMPLETED_GOALS_QTD } from "@/data/goals";
-import { getActiveGoals, getCompletedGoals } from "@/lib/db";
+import { getActiveGoals, getCompletedGoals, getWeeklyReview, getActivityLogs } from "@/lib/db";
 
 export default async function GoalsPage() {
-  const [dbActive, dbCompleted] = await Promise.all([
+  const [goals, completed, weeklyReview, activities] = await Promise.all([
     getActiveGoals(),
     getCompletedGoals(),
+    getWeeklyReview(),
+    getActivityLogs(),
   ]);
-  const goals = dbActive.length > 0 ? dbActive : ACTIVE_GOALS;
-  const completed = dbCompleted.length > 0 ? dbCompleted : COMPLETED_GOALS_QTD;
   const onTrack = goals.filter((g) => g.status === "on-track").length;
   const atRisk = goals.filter(
     (g) => g.status === "at-risk" || g.status === "behind",
@@ -78,20 +77,20 @@ export default async function GoalsPage() {
       {/* Milestone Timeline + Priority Matrix */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 lg:col-span-7">
-          <MilestoneTimeline />
+          <MilestoneTimeline goals={goals} />
         </div>
         <div className="col-span-12 sm:col-span-6 lg:col-span-5">
           <PriorityMatrix goals={goals} />
         </div>
       </SectionGrid>
 
-      {/* Recent Progress + Quarterly Review */}
+      {/* Recent Progress + Weekly Review */}
       <SectionGrid>
         <div className="col-span-12 sm:col-span-6 lg:col-span-5">
-          <RecentProgress />
+          <RecentProgress activities={activities} />
         </div>
         <div className="col-span-12 sm:col-span-6 lg:col-span-7">
-          <QuarterlyReview />
+          <QuarterlyReview review={weeklyReview} />
         </div>
       </SectionGrid>
     </PageContainer>

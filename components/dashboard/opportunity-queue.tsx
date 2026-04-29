@@ -2,11 +2,15 @@
 
 import { Lightbulb } from "lucide-react";
 import { FeedSection, type FeedItem } from "@/components/primitives/feed-section";
-import { OPPORTUNITIES } from "@/data/dashboard";
 import { formatCurrency } from "@/lib/format";
+import type { Opportunity } from "@/data/types";
 
-export function OpportunityQueue() {
-  const items: FeedItem[] = OPPORTUNITIES.map((opp) => ({
+interface Props {
+  opportunities: Opportunity[];
+}
+
+export function OpportunityQueue({ opportunities }: Props) {
+  const items: FeedItem[] = opportunities.map((opp) => ({
     id: opp.id,
     icon: Lightbulb,
     iconColor: "var(--text-secondary)",

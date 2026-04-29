@@ -3,16 +3,15 @@
 import { FolderKanban } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
 import { RingProgress } from "@/components/primitives/ring-progress";
-import { ACTIVE_PROJECTS } from "@/data/dashboard";
 import type { DataListItem } from "@/components/primitives/data-list";
 import type { Project } from "@/data/types";
 
 interface Props { projects?: Project[] }
 
-export function ActiveProjects({ projects }: Props = {}) {
-  const data = projects && projects.length > 0 ? projects : ACTIVE_PROJECTS;
+export function ActiveProjects({ projects = [] }: Props) {
+  const data = projects;
   const focusedId =
-    (data.find((p) => p.priority === "high") ?? data[0])?.id ?? "";
+    (data.find((p) => p.priority === "critical") ?? data.find((p) => p.priority === "high") ?? data[0])?.id ?? "";
 
   const items: DataListItem[] = data.map((p) => ({
     id: p.id,

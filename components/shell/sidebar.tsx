@@ -2,8 +2,11 @@
 
 import { SidebarNav } from "./sidebar-nav";
 import { OperatorCard } from "./operator-card";
+import type { Operator } from "@/data/types";
 
-export function Sidebar() {
+interface Props { operator?: Operator | null }
+
+export function Sidebar({ operator }: Props = {}) {
   return (
     <aside
       className="flex flex-col h-full w-[var(--sidebar-width)] 2xl:w-[var(--sidebar-width-wide)]"
@@ -43,7 +46,7 @@ export function Sidebar() {
         className="flex-shrink-0 px-3 pt-3 pb-4"
         style={{ borderTop: "1px solid var(--border-subtle)" }}
       >
-        <OperatorCard />
+        <OperatorCard operator={operator} />
       </div>
     </aside>
   );

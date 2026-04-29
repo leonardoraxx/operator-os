@@ -1,12 +1,11 @@
 import { BookOpen } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
-import { QUARTERLY_REVIEW } from "@/data/goals";
+import type { WeeklyReviewData } from "@/lib/db";
 
 interface ReviewColumnProps {
   label: string;
   dotColor: string;
   items: string[];
-  /** Render single paragraph instead of list (used for Next Focus / Cut). */
   paragraph?: string;
 }
 
@@ -19,66 +18,46 @@ function ReviewColumn({ label, dotColor, items, paragraph }: ReviewColumnProps) 
           style={{ background: dotColor }}
           aria-hidden
         />
-        <p
-          className="text-eyebrow"
-          style={{ color: "var(--text-muted)" }}
-        >
+        <p className="text-eyebrow" style={{ color: "var(--text-muted)" }}>
           {label}
         </p>
       </div>
       {paragraph ? (
-        <p
-          className="text-small leading-snug"
-          style={{ color: "var(--text-primary)" }}
-        >
-          {paragraph}
+        <p className="text-small leading-snug" style={{ color: "var(--text-primary)" }}>
+          {paragraph || "Not set"}
         </p>
       ) : (
         <ul className="flex flex-col gap-1.5">
-          {items.map((it, i) => (
-            <li
-              key={i}
-              className="text-small leading-snug"
-              style={{ color: "var(--text-secondary)" }}
-            >
+          {items.length > 0 ? items.map((it, i) => (
+            <li key={i} className="text-small leading-snug" style={{ color: "var(--text-secondary)" }}>
               · {it}
             </li>
-          ))}
+          )) : (
+            <li className="text-tiny" style={{ color: "var(--text-muted)" }}>Nothing logged</li>
+          )}
         </ul>
       )}
     </div>
   );
 }
 
-export function QuarterlyReview() {
+interface Props {
+  review?: WeeklyReviewData | null;
+}
+
+export function QuarterlyReview({ review }: Props = {}) {
+  const data = review ?? { wins: [], losses: [], nextMetric: "", doubleDown: "" };
+
   return (
     <GlassCard
-      header={{ icon: BookOpen, title: "Quarterly Review · Q2 2026" }}
+      header={{ icon: BookOpen, title: "Weekly Review" }}
       padding="md"
     >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5 md:gap-4">
-        <ReviewColumn
-          label="Wins"
-          dotColor="var(--status-success)"
-          items={QUARTERLY_REVIEW.wins}
-        />
-        <ReviewColumn
-          label="Misses"
-          dotColor="var(--status-warning)"
-          items={QUARTERLY_REVIEW.misses}
-        />
-        <ReviewColumn
-          label="Next Focus"
-          dotColor="var(--accent)"
-          items={[]}
-          paragraph={QUARTERLY_REVIEW.nextFocus}
-        />
-        <ReviewColumn
-          label="Cut"
-          dotColor="var(--status-danger)"
-          items={[]}
-          paragraph={QUARTERLY_REVIEW.cut}
-        />
+        <ReviewColumn label="Wins" dotColor="var(--status-success)" items={data.wins} />
+        <ReviewColumn label="Losses" dotColor="var(--status-warning)" items={data.losses} />
+        <ReviewColumn label="Next Focus" dotColor="var(--accent)" items={[]} paragraph={data.nextMetric} />
+        <ReviewColumn label="Double Down" dotColor="var(--status-danger)" items={[]} paragraph={data.doubleDown} />
       </div>
     </GlassCard>
   );

@@ -5,14 +5,13 @@ import { GlassCard } from "@/components/primitives/glass-card";
 import { DataTable, type DataTableColumn } from "@/components/primitives/data-table";
 import { ProgressBar } from "@/components/primitives/progress-bar";
 import { StatusBadge } from "@/components/primitives/status-badge";
-import { ACTIVE_GOALS } from "@/data/goals";
 import { formatDate } from "@/lib/format";
 import type { Goal } from "@/data/types";
 
 interface Props { goals?: Goal[] }
 
-export function ActiveGoalsTable({ goals }: Props = {}) {
-  const data = goals && goals.length > 0 ? goals : ACTIVE_GOALS;
+export function ActiveGoalsTable({ goals = [] }: Props) {
+  const data = goals;
   // Determine focused goal — the one HeroCard features. Only that row gets accent progress.
   const focusedId =
     (data.find((g) => g.priority === "critical") ?? data[0])?.id ?? "";

@@ -2,18 +2,22 @@
 
 import { GitBranch } from "lucide-react";
 import { FeedSection, type FeedItem } from "@/components/primitives/feed-section";
-import { DECISIONS } from "@/data/dashboard";
 import { formatDate } from "@/lib/format";
+import type { Decision } from "@/data/types";
 
-const TODAY = "2026-04-28";
+interface Props {
+  decisions: Decision[];
+}
+
+const TODAY = new Date().toISOString().slice(0, 10);
 
 function groupLabel(dateIso: string): string {
   if (dateIso === TODAY) return "TODAY";
   return formatDate(dateIso, { month: "short", day: "numeric" }).toUpperCase();
 }
 
-export function DecisionLog() {
-  const sorted = [...DECISIONS].sort(
+export function DecisionLog({ decisions }: Props) {
+  const sorted = [...decisions].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 

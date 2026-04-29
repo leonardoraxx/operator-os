@@ -3,7 +3,6 @@ import {
   MatrixSection,
   type MatrixQuadrant,
 } from "@/components/primitives/matrix-section";
-import { ACTIVE_GOALS } from "@/data/goals";
 import type { Goal } from "@/data/types";
 
 const QUADRANT_KEYS: NonNullable<Goal["quadrant"]>[] = [
@@ -31,8 +30,8 @@ const CATEGORY_DOT: Record<string, string> = {
 
 interface Props { goals?: Goal[] }
 
-export function PriorityMatrix({ goals }: Props = {}) {
-  const data = goals && goals.length > 0 ? goals : ACTIVE_GOALS;
+export function PriorityMatrix({ goals = [] }: Props) {
+  const data = goals;
   const quadrants = QUADRANT_KEYS.map((key): MatrixQuadrant => {
     const inQuad = data.filter((g) => g.quadrant === key);
     return {

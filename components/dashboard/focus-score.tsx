@@ -4,14 +4,14 @@ import { Brain } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
 import { ScoreRing } from "@/components/primitives/score-ring";
 import { LineSpark } from "@/components/primitives/line-spark";
-import { OPERATOR } from "@/data/operator";
 import { useMounted } from "@/hooks/use-mounted";
 import type { Score } from "@/data/types";
 
+const EMPTY_SCORE: Score = { value: 0, delta: 0, sparkline: [], label: "Focus Score" };
+
 interface Props { score?: Score }
 
-export function FocusScore({ score: propScore }: Props = {}) {
-  const score = propScore ?? OPERATOR.focusScore;
+export function FocusScore({ score = EMPTY_SCORE }: Props) {
   const mounted = useMounted();
   const tone = score.value >= 80 ? "accent" : "neutral";
   const lineTone = score.delta >= 5 ? "accent" : "neutral";

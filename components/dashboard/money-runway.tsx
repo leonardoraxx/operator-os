@@ -1,12 +1,15 @@
 import { Landmark } from "lucide-react";
 import { GlassCard } from "@/components/primitives/glass-card";
 import { formatCurrency } from "@/lib/format";
-import { MONEY_SNAPSHOT } from "@/data/dashboard";
+import type { MoneyData } from "@/lib/db";
 
-export function MoneyRunway() {
-  const data = MONEY_SNAPSHOT;
-  const burnPerDay = data.expensesThisWeek / 7;
-  const runway = Math.floor(data.cashAvailable / burnPerDay);
+interface Props {
+  money: MoneyData;
+}
+
+export function MoneyRunway({ money }: Props) {
+  const burnPerDay = money.expensesThisWeek > 0 ? money.expensesThisWeek / 7 : 0;
+  const runway = burnPerDay > 0 ? Math.floor(money.cashAvailable / burnPerDay) : 0;
 
   return (
     <GlassCard
@@ -19,7 +22,7 @@ export function MoneyRunway() {
             className="text-metric-value-lg tabular-nums leading-none"
             style={{ color: "var(--text-primary)" }}
           >
-            {runway}
+            {runway > 0 ? runway : "—"}
           </p>
           <p className="text-tiny mt-1" style={{ color: "var(--text-muted)" }}>
             days runway
@@ -29,10 +32,10 @@ export function MoneyRunway() {
           className="flex flex-col gap-1.5 mt-auto pt-3"
           style={{ borderTop: "1px solid var(--border-subtle)" }}
         >
-          <Row label="Cash" value={formatCurrency(data.cashAvailable)} />
+          <Row label="Cash" value={formatCurrency(money.cashAvailable)} />
           <Row
             label="Burn / day"
-            value={formatCurrency(burnPerDay)}
+            value={burnPerDay > 0 ? formatCurrency(burnPerDay) : "—"}
             tone="danger"
           />
         </div>

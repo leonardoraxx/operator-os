@@ -5,35 +5,12 @@ import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
 import { KPICard } from "@/components/primitives/kpi-card";
-import { AGENT_TASKS } from "@/data/dashboard";
 import { formatRelative } from "@/lib/format";
 import { useState } from "react";
 import type { AgentTask } from "@/data/types";
 
-const EXTENDED_TASKS_FALLBACK: AgentTask[] = [
-  ...AGENT_TASKS,
-  {
-    id: "at4",
-    agent: "Research Agent",
-    description: "5 competitor pricing sheets collected and summarized",
-    count: 5,
-    status: "approved",
-    timestamp: "2026-04-25T18:00:00Z",
-  },
-  {
-    id: "at5",
-    agent: "Content Agent",
-    description: "Captions drafted for 3 Instagram Reels",
-    count: 3,
-    status: "rejected",
-    timestamp: "2026-04-25T14:00:00Z",
-  },
-];
-
-export function AgentInboxClient({ tasks: initialTasks }: { tasks?: AgentTask[] }) {
-  const [tasks, setTasks] = useState<AgentTask[]>(
-    initialTasks && initialTasks.length > 0 ? initialTasks : EXTENDED_TASKS_FALLBACK,
-  );
+export function AgentInboxClient({ tasks: initialTasks = [] }: { tasks?: AgentTask[] }) {
+  const [tasks, setTasks] = useState<AgentTask[]>(initialTasks);
 
   const pending = tasks.filter((t) => t.status === "pending").length;
   const approved = tasks.filter((t) => t.status === "approved").length;

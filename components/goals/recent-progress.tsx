@@ -2,41 +2,38 @@
 
 import { Activity, TrendingUp, Flag } from "lucide-react";
 import { FeedSection, type FeedItem } from "@/components/primitives/feed-section";
-import { RECENT_PROGRESS } from "@/data/goals";
+import { formatDate } from "@/lib/format";
+import type { ActivityEntry } from "@/lib/db";
 
-const TODAY = "2026-04-27";
-const YESTERDAY = "2026-04-26";
+interface Props {
+  activities?: ActivityEntry[];
+}
+
+const TODAY = new Date().toISOString().slice(0, 10);
+const YESTERDAY = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
 function groupLabel(dateIso: string): string {
   if (dateIso === TODAY) return "TODAY";
   if (dateIso === YESTERDAY) return "YESTERDAY";
-  const d = new Date(dateIso);
-  return d
-    .toLocaleDateString("en-US", { month: "short", day: "numeric" })
-    .toUpperCase();
+  return formatDate(dateIso, { month: "short", day: "numeric" }).toUpperCase();
 }
 
-export function RecentProgress() {
-  // Sort newest first by date, then group preserves order.
-  const sorted = [...RECENT_PROGRESS].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  );
-
-  const items: FeedItem[] = sorted.map((entry) => ({
-    id: entry.id,
-    icon: entry.type === "milestone" ? Flag : TrendingUp,
-    iconColor:
-      entry.type === "milestone"
-        ? "var(--status-success)"
-        : "var(--text-secondary)",
-    title: entry.goalTitle,
-    meta: entry.update,
-    impact:
-      entry.type === "milestone"
-        ? { label: "Milestone", tone: "success" }
-        : { label: "Progress", tone: "neutral" },
-    group: groupLabel(entry.date),
-  }));
+export function RecentProgress({ activities = [] }: Props) {
+  const items: FeedItem[] = activities.map((a) => {
+    const isMilestone = a.target_type === "milestone";
+    const dateStr = a.created_at.slice(0, 10);
+    return {
+      id: a.id,
+      icon: isMilestone ? Flag : TrendingUp,
+      iconColor: isMilestone ? "var(--status-success)" : "var(--text-secondary)",
+      title: a.detail?.title ?? a.action,
+      meta: a.detail?.update ?? a.actor,
+      impact: isMilestone
+        ? { label: "Milestone", tone: "success" as const }
+        : { label: "Progress", tone: "neutral" as const },
+      group: groupLabel(dateStr),
+    };
+  });
 
   return (
     <FeedSection

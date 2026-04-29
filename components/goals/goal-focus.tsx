@@ -3,7 +3,6 @@
 import { Check, Circle, ArrowRight } from "lucide-react";
 import { HeroCard } from "@/components/primitives/hero-card";
 import { ProgressBar } from "@/components/primitives/progress-bar";
-import { ACTIVE_GOALS } from "@/data/goals";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { Goal } from "@/data/types";
 
@@ -16,8 +15,8 @@ const PRIORITY_LABEL: Record<string, string> = {
 
 interface Props { goals?: Goal[] }
 
-export function GoalFocus({ goals }: Props = {}) {
-  const data = goals && goals.length > 0 ? goals : ACTIVE_GOALS;
+export function GoalFocus({ goals = [] }: Props) {
+  const data = goals;
   // Feature the most critical goal
   const goal = data.find((g) => g.priority === "critical") ?? data[0];
   if (!goal) return null;

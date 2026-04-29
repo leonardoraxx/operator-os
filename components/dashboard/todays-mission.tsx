@@ -3,13 +3,21 @@
 import { Check, Circle, ArrowRight } from "lucide-react";
 import { HeroCard } from "@/components/primitives/hero-card";
 import { ProgressBar } from "@/components/primitives/progress-bar";
-import { TODAYS_MISSION } from "@/data/dashboard";
 import type { Mission } from "@/data/types";
 
 interface Props { mission?: Mission | null }
 
-export function TodaysMission({ mission: propMission }: Props = {}) {
-  const mission = propMission ?? TODAYS_MISSION;
+export function TodaysMission({ mission }: Props = {}) {
+  if (!mission) {
+    return (
+      <div
+        className="rounded-[var(--radius-xl)] p-6 flex items-center justify-center"
+        style={{ background: "var(--bg-glass-subtle)", border: "1px solid var(--border-subtle)", minHeight: 200 }}
+      >
+        <p className="text-small" style={{ color: "var(--text-muted)" }}>No mission set for today.</p>
+      </div>
+    );
+  }
   const doneCount = mission.actions.filter((a) => a.done).length;
   const total = mission.actions.length;
   const progress = Math.round((doneCount / total) * 100);

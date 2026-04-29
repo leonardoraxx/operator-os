@@ -1,34 +1,40 @@
 "use client";
 
-import { Zap, Video, Mail, CheckSquare, MessageSquare, Phone, FileText } from "lucide-react";
+import { Zap, Video, Mail, CheckSquare, MessageSquare, Phone, FileText, Activity } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
-import { OUTPUT_ITEMS } from "@/data/dashboard";
 import { formatRelative } from "@/lib/format";
-import type { OutputItem } from "@/data/types";
 import type { DataListItem } from "@/components/primitives/data-list";
+import type { ActivityEntry } from "@/lib/db";
 
-const TYPE_ICONS: Record<OutputItem["type"], typeof Video> = {
-  video: Video,
-  post: MessageSquare,
-  email: Mail,
-  call: Phone,
-  task: CheckSquare,
-  doc: FileText,
-};
+interface Props {
+  activities: ActivityEntry[];
+}
 
-export function OutputTracker() {
-  const items: DataListItem[] = OUTPUT_ITEMS.map((item) => ({
-    id: item.id,
-    icon: TYPE_ICONS[item.type],
+function iconForType(targetType: string | null) {
+  switch (targetType) {
+    case "video": return Video;
+    case "post": return MessageSquare;
+    case "email": return Mail;
+    case "call": return Phone;
+    case "task": return CheckSquare;
+    case "doc": return FileText;
+    default: return Activity;
+  }
+}
+
+export function OutputTracker({ activities }: Props) {
+  const items: DataListItem[] = activities.map((a) => ({
+    id: a.id,
+    icon: iconForType(a.target_type),
     iconColor: "var(--text-secondary)",
-    title: item.title,
-    meta: item.platform,
+    title: a.detail?.title ?? a.action,
+    meta: a.detail?.platform ?? a.actor,
     trailing: (
       <span
         className="text-tiny tabular-nums flex-shrink-0"
         style={{ color: "var(--text-muted)" }}
       >
-        {formatRelative(item.timestamp)}
+        {formatRelative(a.created_at)}
       </span>
     ),
   }));
@@ -37,7 +43,7 @@ export function OutputTracker() {
     <ListSection
       title="Output Tracker"
       icon={Zap}
-      pill={{ label: `${OUTPUT_ITEMS.length} today`, color: "neutral" }}
+      pill={{ label: `${activities.length} logged`, color: "neutral" }}
       items={items}
       footer="View all output →"
     />
