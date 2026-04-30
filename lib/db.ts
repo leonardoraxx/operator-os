@@ -664,13 +664,18 @@ export async function getLeads(): Promise<Lead[]> {
   }));
 }
 
-// ── Prompt Library — table exists, currently empty ───────────────────
+// ── Prompt Library ────────────────────────────────────────────────────
+// Confirmed columns: id, prompt_name (NOT NULL), category, prompt_text,
+//   used_for, last_used, success_rating, created_at, updated_at
 export interface PromptEntry {
-  id:       string;
-  title:    string;
-  prompt:   string;
-  category: string;
-  tags:     string[];
+  id:            string;
+  promptName:    string;
+  category:      string;
+  promptText:    string;
+  usedFor:       string;      // use-case description
+  lastUsed:      string | null;
+  successRating: number | null;  // 1–5
+  createdAt:     string;
 }
 
 export async function getPromptLibrary(): Promise<PromptEntry[]> {
@@ -678,17 +683,20 @@ export async function getPromptLibrary(): Promise<PromptEntry[]> {
     () =>
       supabaseServer
         .from("prompt_library")
-        .select("*")
+        .select("id,prompt_name,category,prompt_text,used_for,last_used,success_rating,created_at")
         .order("created_at", { ascending: false })
         .limit(100),
     [] as Record<string, unknown>[]
   );
   return rows.map((r) => ({
-    id:       String(r.id       ?? ""),
-    title:    String(r.title    ?? ""),
-    prompt:   String(r.prompt   ?? r.content ?? ""),
-    category: String(r.category ?? ""),
-    tags:     Array.isArray(r.tags) ? r.tags.map(String) : [],
+    id:            String(r.id             ?? ""),
+    promptName:    String(r.prompt_name    ?? ""),
+    category:      String(r.category       ?? ""),
+    promptText:    String(r.prompt_text    ?? ""),
+    usedFor:       String(r.used_for       ?? ""),
+    lastUsed:      r.last_used ? String(r.last_used) : null,
+    successRating: r.success_rating != null ? Number(r.success_rating) : null,
+    createdAt:     String(r.created_at     ?? ""),
   }));
 }
 
