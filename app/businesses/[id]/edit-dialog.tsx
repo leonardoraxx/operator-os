@@ -72,23 +72,30 @@ export function EditBusinessDialog({ business }: Props) {
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0" style={{ background: "rgba(0,0,0,0.6)", zIndex: 900 }} />
-        <Dialog.Content
-          className="w-full max-w-lg rounded-[var(--radius-card)] p-6 outline-none overflow-y-auto"
+        <Dialog.Overlay
           style={{
             position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            maxHeight: "90vh",
-            background: "var(--bg-glass-elevated)",
-            backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-            WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-            border: "1px solid var(--border-default)",
-            boxShadow: "var(--shadow-elevated)",
-            zIndex: 901,
+            inset: 0,
+            zIndex: 900,
+            background: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1rem",
           }}
         >
+          <Dialog.Content
+            className="w-full max-w-lg rounded-[var(--radius-card)] p-6 outline-none overflow-y-auto"
+            style={{
+              position: "relative",
+              maxHeight: "90vh",
+              background: "var(--bg-glass-elevated)",
+              backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+              WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+              border: "1px solid var(--border-default)",
+              boxShadow: "var(--shadow-elevated)",
+            }}
+          >
           <div className="flex items-center justify-between mb-5">
             <Dialog.Title className="text-[15px] font-semibold" style={{ color: "var(--text-primary)" }}>
               Edit Business
@@ -178,6 +185,7 @@ export function EditBusinessDialog({ business }: Props) {
             </button>
           </form>
         </Dialog.Content>
+        </Dialog.Overlay>
       </Dialog.Portal>
     </Dialog.Root>
   );

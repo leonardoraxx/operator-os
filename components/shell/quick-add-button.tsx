@@ -78,38 +78,43 @@ function QuickDialog({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay
-          className="fixed inset-0"
-          style={{ background: "rgba(0,0,0,0.6)", zIndex: 950 }}
-        />
-        <Dialog.Content
-          className="w-full max-w-md rounded-[var(--radius-card)] p-6 outline-none"
           style={{
             position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            maxHeight: "90vh",
-            overflowY: "auto",
-            background: "var(--bg-glass-elevated)",
-            backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-            WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-            border: "1px solid var(--border-default)",
-            boxShadow: "var(--shadow-elevated)",
-            zIndex: 951,
+            inset: 0,
+            zIndex: 950,
+            background: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1rem",
           }}
         >
-          <div className="flex items-center justify-between mb-5">
-            <Dialog.Title className="text-[15px] font-semibold" style={{ color: "var(--text-primary)" }}>
-              {title}
-            </Dialog.Title>
-            <Dialog.Close asChild>
-              <button className="outline-none" style={{ color: "var(--text-subtle)" }}>
-                <X size={16} />
-              </button>
-            </Dialog.Close>
-          </div>
-          {children}
-        </Dialog.Content>
+          <Dialog.Content
+            className="w-full max-w-md rounded-[var(--radius-card)] p-6 outline-none"
+            style={{
+              position: "relative",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              background: "var(--bg-glass-elevated)",
+              backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+              WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+              border: "1px solid var(--border-default)",
+              boxShadow: "var(--shadow-elevated)",
+            }}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <Dialog.Title className="text-[15px] font-semibold" style={{ color: "var(--text-primary)" }}>
+                {title}
+              </Dialog.Title>
+              <Dialog.Close asChild>
+                <button className="outline-none" style={{ color: "var(--text-subtle)" }}>
+                  <X size={16} />
+                </button>
+              </Dialog.Close>
+            </div>
+            {children}
+          </Dialog.Content>
+        </Dialog.Overlay>
       </Dialog.Portal>
     </Dialog.Root>
   );
