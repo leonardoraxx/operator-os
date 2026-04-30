@@ -625,14 +625,20 @@ export async function getContentPipeline(): Promise<ContentPipelineItem[]> {
   }));
 }
 
-// ── Leads — table exists, currently empty ────────────────────────────
+// ── Leads ─────────────────────────────────────────────────────────────
+// Confirmed columns: id, name, email, phone, status, source,
+//   notes, follow_up_date, created_at, updated_at
+// Status values (conventional): new | contacted | quoted | won | lost
 export interface Lead {
-  id:      string;
-  name:    string;
-  source:  string;
-  status:  string;
-  value:   number;
-  notes:   string | null;
+  id:            string;
+  name:          string;
+  email:         string;
+  phone:         string;
+  status:        string;
+  source:        string;   // service type / lead source (pressure-wash, soft-wash, etc.)
+  notes:         string;
+  followUpDate:  string | null;
+  createdAt:     string;
 }
 
 export async function getLeads(): Promise<Lead[]> {
@@ -640,18 +646,21 @@ export async function getLeads(): Promise<Lead[]> {
     () =>
       supabaseServer
         .from("leads")
-        .select("*")
+        .select("id,name,email,phone,status,source,notes,follow_up_date,created_at")
         .order("created_at", { ascending: false })
-        .limit(50),
+        .limit(100),
     [] as Record<string, unknown>[]
   );
   return rows.map((r) => ({
-    id:     String(r.id     ?? ""),
-    name:   String(r.name   ?? ""),
-    source: String(r.source ?? ""),
-    status: String(r.status ?? ""),
-    value:  Number(r.value  ?? 0),
-    notes:  r.notes ? String(r.notes) : null,
+    id:           String(r.id             ?? ""),
+    name:         String(r.name           ?? ""),
+    email:        String(r.email          ?? ""),
+    phone:        String(r.phone          ?? ""),
+    status:       String(r.status         ?? "new"),
+    source:       String(r.source         ?? ""),
+    notes:        String(r.notes          ?? ""),
+    followUpDate: r.follow_up_date ? String(r.follow_up_date) : null,
+    createdAt:    String(r.created_at     ?? ""),
   }));
 }
 

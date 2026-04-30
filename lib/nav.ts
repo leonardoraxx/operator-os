@@ -15,6 +15,7 @@ import {
   BarChart3,
   Layers,
   Settings,
+  Droplets,
   type LucideIcon,
 } from "lucide-react";
 
@@ -34,6 +35,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Goals", href: "/goals", icon: Target },
   { label: "Businesses", href: "/businesses", icon: Building2 },
+  { label: "Leads", href: "/leads", icon: Droplets },
   { label: "Projects", href: "/projects", icon: FolderKanban },
   { label: "Content", href: "/content", icon: FileVideo },
   { label: "Clipping", href: "/clipping", icon: Scissors },
