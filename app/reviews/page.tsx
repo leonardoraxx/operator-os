@@ -1,8 +1,10 @@
+export const dynamic = "force-dynamic";
+
 import { Sun, CalendarDays, Archive } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
-import { ScoreRing } from "@/components/primitives/score-ring";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import { getDailyReview, getWeeklyReview } from "@/lib/db";
 
 export default async function ReviewsPage() {
@@ -23,15 +25,24 @@ export default async function ReviewsPage() {
       <div className="space-y-4">
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          {/* Daily Review */}
           <GlassCard
             header={{ icon: Sun, title: `Daily Review — ${today}` }}
-            footer="Start today's review →"
+            footer={
+              <CardFooterLink
+                href="/dashboard"
+                label="Go to Daily Scoreboard →"
+              />
+            }
           >
             {dailyEntries.length === 0 ? (
               <div className="text-center py-6" style={{ color: "var(--text-subtle)" }}>
                 <Sun size={28} className="mx-auto mb-2 opacity-30" />
                 <p className="text-sm font-medium">No review for today yet</p>
-                <p className="text-xs mt-1">Complete your daily closeout to populate this.</p>
+                <p className="text-xs mt-1 opacity-70">
+                  Complete your daily scoreboard on the dashboard to populate this.
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -41,7 +52,7 @@ export default async function ReviewsPage() {
                     className="rounded-xl p-2.5"
                     style={{
                       background: "var(--bg-glass-subtle)",
-                      border: "1px solid var(--border-subtle)",
+                      border:     "1px solid var(--border-subtle)",
                     }}
                   >
                     <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
@@ -56,15 +67,23 @@ export default async function ReviewsPage() {
             )}
           </GlassCard>
 
+          {/* Weekly Review */}
           <GlassCard
             header={{ icon: CalendarDays, title: "Weekly Review" }}
-            footer="Start weekly review →"
+            footer={
+              <CardFooterLink
+                href="/goals"
+                label="View Goals →"
+              />
+            }
           >
             {!weeklyReview ? (
               <div className="text-center py-6" style={{ color: "var(--text-subtle)" }}>
                 <CalendarDays size={28} className="mx-auto mb-2 opacity-30" />
                 <p className="text-sm font-medium">No weekly review yet</p>
-                <p className="text-xs mt-1">Add a row to weekly_reviews for this ISO week.</p>
+                <p className="text-xs mt-1 opacity-70">
+                  Add a row to the <code>weekly_reviews</code> table for this ISO week.
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -75,9 +94,7 @@ export default async function ReviewsPage() {
                     </p>
                     <ul className="space-y-1">
                       {weeklyReview.wins.map((w, i) => (
-                        <li key={i} className="text-sm" style={{ color: "var(--text-primary)" }}>
-                          · {w}
-                        </li>
+                        <li key={i} className="text-sm" style={{ color: "var(--text-primary)" }}>· {w}</li>
                       ))}
                     </ul>
                   </div>
@@ -89,9 +106,7 @@ export default async function ReviewsPage() {
                     </p>
                     <ul className="space-y-1">
                       {weeklyReview.losses.map((l, i) => (
-                        <li key={i} className="text-sm" style={{ color: "var(--text-primary)" }}>
-                          · {l}
-                        </li>
+                        <li key={i} className="text-sm" style={{ color: "var(--text-primary)" }}>· {l}</li>
                       ))}
                     </ul>
                   </div>
@@ -111,16 +126,17 @@ export default async function ReviewsPage() {
           </GlassCard>
         </div>
 
-        <GlassCard
-          header={{ icon: Archive, title: "Quarterly Review" }}
-          footer="View full review →"
-        >
+        {/* Quarterly Review — no table yet, honest disabled state */}
+        <GlassCard header={{ icon: Archive, title: "Quarterly Review" }}>
           <div className="text-center py-6" style={{ color: "var(--text-subtle)" }}>
             <Archive size={28} className="mx-auto mb-2 opacity-30" />
-            <p className="text-sm font-medium">Quarterly review not yet connected</p>
-            <p className="text-xs mt-1">Add quarterly_reviews table to Supabase to enable this.</p>
+            <p className="text-sm font-medium">Not yet connected</p>
+            <p className="text-xs mt-1 opacity-70">
+              Add a <code>quarterly_reviews</code> table to Supabase to enable this section.
+            </p>
           </div>
         </GlassCard>
+
       </div>
     </PageContainer>
   );
