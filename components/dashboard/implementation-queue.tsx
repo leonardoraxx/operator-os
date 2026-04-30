@@ -58,7 +58,7 @@ export function ImplementationQueue({ items = [] }: Props) {
           color: activeCount > 0 ? "gold" : "neutral",
         },
       }}
-      footer={<CardFooterLink href="/projects" label="View projects →" />}
+      footer={<CardFooterLink href="/queue" label="View full queue →" />}
       padding="sm"
     >
       {items.length === 0 ? (

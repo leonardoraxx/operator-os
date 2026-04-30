@@ -533,7 +533,8 @@ export async function getImplementationQueue(): Promise<ImplementationItem[]> {
       supabaseServer
         .from("implementation_queue")
         .select("id,phase,sequence_order,title,prompt,status,priority,category,success_criteria")
-        .order("sequence_order", { ascending: true }),
+        .order("phase",           { ascending: true })
+        .order("sequence_order",  { ascending: true }),
     [] as Record<string, unknown>[]
   );
   return rows.map((r) => ({
