@@ -9,13 +9,5 @@ export default async function SettingsPage() {
     getOperatorPreferences(),
   ]);
 
-  const safeOperator = operator ?? {
-    name:           "Operator",
-    handle:         "",
-    role:           "",
-    focusScore:     { value: 0, delta: 0, sparkline: [], label: "Focus" },
-    executionScore: { value: 0, delta: 0, sparkline: [], label: "Execution" },
-  };
-
-  return <SettingsClient operator={safeOperator} preferences={preferences} />;
+  return <SettingsClient operator={operator} preferences={preferences} />;
 }

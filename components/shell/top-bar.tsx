@@ -13,7 +13,7 @@ interface TopBarProps {
   operator?: Operator | null;
 }
 
-export function TopBar({ breadcrumb, notificationCount = 3, operator }: TopBarProps) {
+export function TopBar({ breadcrumb, notificationCount = 0, operator }: TopBarProps) {
   const router = useRouter();
   return (
     <header

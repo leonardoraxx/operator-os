@@ -9,7 +9,28 @@ interface Props { operator?: Operator | null }
 
 export function OperatorCard({ operator }: Props = {}) {
   const mounted = useMounted();
-  const op = operator ?? { name: "Operator", role: "—", handle: "", focusScore: { value: 0, delta: 0, sparkline: [], label: "Focus" }, executionScore: { value: 0, delta: 0, sparkline: [], label: "Execution" } };
+
+  if (!operator) {
+    return (
+      <div
+        className="rounded-xl p-3"
+        style={{ background: "var(--bg-glass-subtle)", border: "1px solid var(--border-subtle)" }}
+      >
+        <div className="flex items-center gap-2.5">
+          <div
+            className="w-9 h-9 rounded-full flex-shrink-0"
+            style={{ background: "var(--bg-glass-elevated)", border: "1px solid var(--border-default)" }}
+          />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-3 rounded" style={{ background: "var(--bg-glass-elevated)", width: "60%" }} />
+            <div className="h-2.5 rounded" style={{ background: "var(--bg-glass-elevated)", width: "40%" }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const op = operator;
   const accentDelta = op.focusScore.delta >= 5;
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Palette, Plug, Bell, Database } from "lucide-react";
+import { User, Palette, Plug, Bell, Database, AlertCircle } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";
 import { GlassCard } from "@/components/primitives/glass-card";
@@ -11,28 +11,20 @@ import type { Operator } from "@/data/types";
 import type { OperatorPreferences } from "@/lib/db";
 
 interface Props {
-  operator:    Operator;
+  operator:    Operator | null;
   preferences: OperatorPreferences | null;
 }
 
 export function SettingsClient({ operator, preferences }: Props) {
-  // Profile fields — map from DB columns
   const [fields, setFields] = useState({
-    name:   operator.name,
-    handle: operator.handle,   // alias
-    role:   operator.role,     // primary_focus
+    name:   operator?.name   ?? "",
+    handle: operator?.handle ?? "",
+    role:   operator?.role   ?? "",
   });
 
-  const [notifications, setNotifications] = useState([
-    { label: "Daily scoreboard reminder", value: "7:00 AM",      enabled: true  },
-    { label: "Evening closeout prompt",   value: "6:30 PM",      enabled: true  },
-    { label: "Agent inbox alerts",        value: "Immediately",  enabled: true  },
-    { label: "Weekly review reminder",    value: "Sunday 9 AM",  enabled: false },
-  ]);
-
-  const [saving,   setSaving]   = useState(false);
-  const [saved,    setSaved]    = useState(false);
-  const [saveErr,  setSaveErr]  = useState<string | null>(null);
+  const [saving,  setSaving]  = useState(false);
+  const [saved,   setSaved]   = useState(false);
+  const [saveErr, setSaveErr] = useState<string | null>(null);
 
   async function handleSaveProfile() {
     setSaving(true);
@@ -47,17 +39,9 @@ export function SettingsClient({ operator, preferences }: Props) {
     }
   }
 
-  function toggleNotification(index: number) {
-    setNotifications((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], enabled: !next[index].enabled };
-      return next;
-    });
-  }
-
   const profileFields = [
-    { key: "name"   as const, label: "Display Name", placeholder: "Edgar" },
-    { key: "handle" as const, label: "Handle / Alias", placeholder: "@ven" },
+    { key: "name"   as const, label: "Display Name",  placeholder: "Your name" },
+    { key: "handle" as const, label: "Handle / Alias", placeholder: "@handle"  },
     { key: "role"   as const, label: "Primary Focus",  placeholder: "Founder & Operator" },
   ];
 
@@ -73,118 +57,143 @@ export function SettingsClient({ operator, preferences }: Props) {
 
           {/* Profile */}
           <GlassCard header={{ icon: User, title: "Profile" }}>
-            <div className="flex items-center gap-4 mb-4">
+            {!operator ? (
+              /* No operator row in DB */
               <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold flex-shrink-0"
-                style={{
-                  background: "var(--bg-glass-subtle)",
-                  color:      "var(--text-secondary)",
-                  border:     "1px solid var(--border-default)",
-                }}
+                className="flex flex-col items-center gap-3 py-8 text-center"
+                style={{ color: "var(--text-subtle)" }}
               >
-                {fields.name[0] ?? "?"}
+                <AlertCircle size={28} className="opacity-40" />
+                <p className="text-sm font-medium">No profile found</p>
+                <p className="text-xs">Add a row to the <code>operator_profile</code> table in Supabase.</p>
               </div>
-              <div>
-                <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
-                  {fields.name}
-                </p>
-                <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                  {fields.role}
-                </p>
-                <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
-                  {fields.handle}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-              {profileFields.map(({ key, label, placeholder }) => (
-                <div key={key}>
-                  <label className="text-xs mb-1 block" style={{ color: "var(--text-subtle)" }}>
-                    {label}
-                  </label>
-                  <input
-                    value={fields[key]}
-                    onChange={(e) => setFields((prev) => ({ ...prev, [key]: e.target.value }))}
-                    placeholder={placeholder}
-                    className="w-full px-3 py-2 text-sm rounded-xl outline-none"
-                    style={{
-                      background: "var(--bg-glass-subtle)",
-                      border:     "1px solid var(--border-default)",
-                      color:      "var(--text-primary)",
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleSaveProfile}
-                disabled={saving}
-                className="px-4 py-2 rounded-xl text-sm font-medium"
-                style={{
-                  background: saved ? "var(--status-success)" : "var(--accent)",
-                  color:      "white",
-                  opacity:    saving ? 0.7 : 1,
-                  cursor:     saving ? "not-allowed" : "pointer",
-                }}
-              >
-                {saving ? "Saving…" : saved ? "Saved ✓" : "Save Profile"}
-              </button>
-              {saveErr && (
-                <p className="text-xs" style={{ color: "var(--status-danger)" }}>
-                  {saveErr}
-                </p>
-              )}
-            </div>
-          </GlassCard>
-
-          {/* System Preferences (from operator_preferences) */}
-          {preferences && (
-            <GlassCard header={{ icon: Database, title: "System Preferences" }}>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[
-                  { label: "Theme",     value: preferences.theme            },
-                  { label: "Accent",    value: preferences.accent           },
-                  { label: "Density",   value: preferences.dashboardDensity },
-                  { label: "Home View", value: preferences.defaultView      },
-                ].map(({ label, value }) => (
+            ) : (
+              <>
+                <div className="flex items-center gap-4 mb-4">
                   <div
-                    key={label}
-                    className="rounded-xl p-3"
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold flex-shrink-0"
                     style={{
                       background: "var(--bg-glass-subtle)",
-                      border:     "1px solid var(--border-subtle)",
+                      color:      "var(--text-secondary)",
+                      border:     "1px solid var(--border-default)",
                     }}
                   >
-                    <p className="text-tiny mb-0.5" style={{ color: "var(--text-subtle)" }}>
-                      {label}
+                    {fields.name[0] ?? "?"}
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+                      {fields.name || "—"}
                     </p>
-                    <p className="text-[13px] font-medium capitalize" style={{ color: "var(--text-primary)" }}>
-                      {value || "—"}
+                    <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+                      {fields.role || "—"}
+                    </p>
+                    <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
+                      {fields.handle || "—"}
                     </p>
                   </div>
-                ))}
-              </div>
-              {Object.keys(preferences.settings).length > 0 && (
-                <div className="mt-3 space-y-1">
-                  {Object.entries(preferences.settings).map(([k, v]) => (
-                    <div
-                      key={k}
-                      className="flex items-center justify-between px-3 py-1.5 rounded-lg"
-                      style={{ background: "var(--bg-glass-subtle)" }}
-                    >
-                      <span className="text-xs" style={{ color: "var(--text-muted)" }}>{k}</span>
-                      <span className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>
-                        {String(v)}
-                      </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                  {profileFields.map(({ key, label, placeholder }) => (
+                    <div key={key}>
+                      <label className="text-xs mb-1 block" style={{ color: "var(--text-subtle)" }}>
+                        {label}
+                      </label>
+                      <input
+                        value={fields[key]}
+                        onChange={(e) => setFields((prev) => ({ ...prev, [key]: e.target.value }))}
+                        placeholder={placeholder}
+                        className="w-full px-3 py-2 text-sm rounded-xl outline-none"
+                        style={{
+                          background: "var(--bg-glass-subtle)",
+                          border:     "1px solid var(--border-default)",
+                          color:      "var(--text-primary)",
+                        }}
+                      />
                     </div>
                   ))}
                 </div>
-              )}
-            </GlassCard>
-          )}
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleSaveProfile}
+                    disabled={saving}
+                    className="px-4 py-2 rounded-xl text-sm font-medium"
+                    style={{
+                      background: saved ? "var(--status-success)" : "var(--accent)",
+                      color:      "white",
+                      opacity:    saving ? 0.7 : 1,
+                      cursor:     saving ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {saving ? "Saving…" : saved ? "Saved ✓" : "Save Profile"}
+                  </button>
+                  {saveErr && (
+                    <p className="text-xs" style={{ color: "var(--status-danger)" }}>
+                      {saveErr}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
+          </GlassCard>
+
+          {/* System Preferences */}
+          <GlassCard header={{ icon: Database, title: "System Preferences" }}>
+            {!preferences ? (
+              <div
+                className="flex flex-col items-center gap-3 py-8 text-center"
+                style={{ color: "var(--text-subtle)" }}
+              >
+                <AlertCircle size={28} className="opacity-40" />
+                <p className="text-sm font-medium">No preferences found</p>
+                <p className="text-xs">Add a row to the <code>operator_preferences</code> table in Supabase.</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { label: "Theme",     value: preferences.theme            },
+                    { label: "Accent",    value: preferences.accent           },
+                    { label: "Density",   value: preferences.dashboardDensity },
+                    { label: "Home View", value: preferences.defaultView      },
+                  ].map(({ label, value }) => (
+                    <div
+                      key={label}
+                      className="rounded-xl p-3"
+                      style={{
+                        background: "var(--bg-glass-subtle)",
+                        border:     "1px solid var(--border-subtle)",
+                      }}
+                    >
+                      <p className="text-tiny mb-0.5" style={{ color: "var(--text-subtle)" }}>
+                        {label}
+                      </p>
+                      <p className="text-[13px] font-medium capitalize" style={{ color: "var(--text-primary)" }}>
+                        {value || "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {Object.keys(preferences.settings).length > 0 && (
+                  <div className="mt-3 space-y-1">
+                    {Object.entries(preferences.settings).map(([k, v]) => (
+                      <div
+                        key={k}
+                        className="flex items-center justify-between px-3 py-1.5 rounded-lg"
+                        style={{ background: "var(--bg-glass-subtle)" }}
+                      >
+                        <span className="text-xs" style={{ color: "var(--text-muted)" }}>{k}</span>
+                        <span className="text-xs font-medium" style={{ color: "var(--text-primary)" }}>
+                          {String(v)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </GlassCard>
 
           {/* Theme */}
           <GlassCard header={{ icon: Palette, title: "Theme" }}>
@@ -217,69 +226,25 @@ export function SettingsClient({ operator, preferences }: Props) {
 
           {/* Integrations */}
           <GlassCard header={{ icon: Plug, title: "Integrations" }}>
-            <div className="space-y-2">
-              {[
-                { name: "Supabase", desc: "Database",       status: "Connected"     },
-                { name: "Render",   desc: "Hosting",        status: "Connected"     },
-                { name: "GitHub",   desc: "Source control", status: "Connected"     },
-                { name: "Notion",   desc: "Notes sync",     status: "Not connected" },
-                { name: "Stripe",   desc: "Revenue",        status: "Not connected" },
-              ].map((integration) => (
-                <div
-                  key={integration.name}
-                  className="flex items-center justify-between p-3 rounded-xl"
-                  style={{ background: "var(--bg-glass-subtle)", border: "1px solid var(--border-subtle)" }}
-                >
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                      {integration.name}
-                    </p>
-                    <p className="text-xs" style={{ color: "var(--text-subtle)" }}>
-                      {integration.desc}
-                    </p>
-                  </div>
-                  <span
-                    className="text-xs px-2 py-0.5 rounded-full"
-                    style={{
-                      background: integration.status === "Connected" ? "var(--status-success-bg)" : "var(--bg-glass-subtle)",
-                      color:      integration.status === "Connected" ? "var(--status-success)"    : "var(--text-subtle)",
-                    }}
-                  >
-                    {integration.status}
-                  </span>
-                </div>
-              ))}
+            <div
+              className="flex flex-col items-center gap-3 py-8 text-center"
+              style={{ color: "var(--text-subtle)" }}
+            >
+              <Plug size={28} className="opacity-30" />
+              <p className="text-sm font-medium">No integrations configured</p>
+              <p className="text-xs">Integration status is not yet connected to Supabase.</p>
             </div>
           </GlassCard>
 
           {/* Notifications */}
           <GlassCard header={{ icon: Bell, title: "Notifications" }}>
-            <div className="space-y-3">
-              {notifications.map((n, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm" style={{ color: "var(--text-primary)" }}>{n.label}</p>
-                    <p className="text-xs" style={{ color: "var(--text-subtle)" }}>{n.value}</p>
-                  </div>
-                  <button
-                    onClick={() => toggleNotification(i)}
-                    className="w-10 h-6 rounded-full relative transition-colors"
-                    style={{
-                      background: n.enabled ? "var(--accent)" : "var(--border-default)",
-                      cursor:     "pointer",
-                    }}
-                    aria-label={`Toggle ${n.label}`}
-                  >
-                    <div
-                      className="w-4 h-4 rounded-full absolute top-1 transition-transform"
-                      style={{
-                        background: "white",
-                        transform:  n.enabled ? "translateX(20px)" : "translateX(4px)",
-                      }}
-                    />
-                  </button>
-                </div>
-              ))}
+            <div
+              className="flex flex-col items-center gap-3 py-8 text-center"
+              style={{ color: "var(--text-subtle)" }}
+            >
+              <Bell size={28} className="opacity-30" />
+              <p className="text-sm font-medium">No notification preferences configured</p>
+              <p className="text-xs">Notification settings are not yet connected to Supabase.</p>
             </div>
           </GlassCard>
 
