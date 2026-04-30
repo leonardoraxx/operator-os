@@ -17,6 +17,7 @@ import {
   Settings,
   Droplets,
   Library,
+  Activity,
   type LucideIcon,
 } from "lucide-react";
 
@@ -50,6 +51,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Queue", href: "/queue", icon: Layers },
   { label: "Calendar", href: "/calendar", icon: Calendar },
   { label: "Reports", href: "/reports", icon: BarChart3 },
+  { label: "Health",   href: "/health",   icon: Activity  },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 

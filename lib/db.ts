@@ -552,8 +552,10 @@ export async function getImplementationQueue(): Promise<ImplementationItem[]> {
 
 // ── System Health Checks ─────────────────────────────────────────────
 // Confirmed columns: id, frontend_connected, settings_working,
-//   buttons_working, render_deployed, last_checked, issues_found
+//   buttons_working, render_deployed, last_checked, issues_found,
+//   created_at, updated_at
 export interface SystemHealth {
+  id:                string;
   frontendConnected: boolean;
   settingsWorking:   boolean;
   buttonsWorking:    boolean;
@@ -567,7 +569,7 @@ export async function getSystemHealth(): Promise<SystemHealth | null> {
     () =>
       supabaseServer
         .from("system_health_checks")
-        .select("frontend_connected,settings_working,buttons_working,render_deployed,last_checked,issues_found")
+        .select("id,frontend_connected,settings_working,buttons_working,render_deployed,last_checked,issues_found")
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle(),
@@ -575,6 +577,7 @@ export async function getSystemHealth(): Promise<SystemHealth | null> {
   );
   if (!row) return null;
   return {
+    id:                String(row.id                ?? ""),
     frontendConnected: Boolean(row.frontend_connected),
     settingsWorking:   Boolean(row.settings_working),
     buttonsWorking:    Boolean(row.buttons_working),
