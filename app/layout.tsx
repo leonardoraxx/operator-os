@@ -5,7 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { AppShell } from "@/components/shell/app-shell";
-import { getOperator } from "@/lib/db";
+import { getOperator, getNotificationCount } from "@/lib/db";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +27,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const operator = await getOperator();
+  const [operator, notificationCount] = await Promise.all([
+    getOperator(),
+    getNotificationCount(),
+  ]);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -38,7 +41,9 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange={false}
         >
-          <AppShell operator={operator}>{children}</AppShell>
+          <AppShell operator={operator} notificationCount={notificationCount}>
+            {children}
+          </AppShell>
         </ThemeProvider>
       </body>
     </html>

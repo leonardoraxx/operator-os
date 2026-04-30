@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { PageContainer } from "@/components/shell/page-container";
 import { SectionGrid } from "@/components/shell/section-grid";
 import { PageHeader } from "@/components/shell/page-header";
-import { TodaysMission } from "@/components/dashboard/todays-mission";
+import { DailyScoreboard } from "@/components/dashboard/daily-scoreboard";
 import { DailyCommand } from "@/components/dashboard/daily-command";
 import { MoneySnapshot } from "@/components/dashboard/money-snapshot";
 import { RiskAlerts } from "@/components/dashboard/risk-alerts";
@@ -17,7 +17,7 @@ import { DailyCloseout } from "@/components/dashboard/daily-closeout";
 import { MoneyRunway } from "@/components/dashboard/money-runway";
 import { ExecutionScore } from "@/components/dashboard/execution-score";
 import { FocusScore } from "@/components/dashboard/focus-score";
-import { OpportunityQueue } from "@/components/dashboard/opportunity-queue";
+import { ImplementationQueue } from "@/components/dashboard/implementation-queue";
 import { DecisionLog } from "@/components/dashboard/decision-log";
 import { KillList } from "@/components/dashboard/kill-list";
 import { AgentApprovalCenter } from "@/components/dashboard/agent-approval-center";
@@ -27,16 +27,16 @@ import {
   getRiskAlerts,
   getKillItems,
   getAgentTasks,
-  getTodaysMission,
   getOperator,
   getDecisions,
-  getOpportunities,
   getWeeklyReview,
   getDailyReview,
   getActivityLogs,
   getOperatorContext,
   getMoneyData,
   getTodayTasks,
+  getDailyScoreboard,
+  getImplementationQueue,
 } from "@/lib/db";
 
 export default async function DashboardPage() {
@@ -46,39 +46,39 @@ export default async function DashboardPage() {
     alerts,
     killItems,
     agentTasks,
-    mission,
     operator,
     decisions,
-    opportunities,
     weeklyReview,
     dailyReview,
     activities,
     bottlenecks,
     money,
     todayTasks,
+    scoreboardEntries,
+    implQueue,
   ] = await Promise.all([
     getActiveGoals(),
     getProjects(),
     getRiskAlerts(),
     getKillItems(),
     getAgentTasks(),
-    getTodaysMission(),
     getOperator(),
     getDecisions(),
-    getOpportunities(),
     getWeeklyReview(),
     getDailyReview(),
     getActivityLogs(),
     getOperatorContext(),
     getMoneyData(),
     getTodayTasks(),
+    getDailyScoreboard(),
+    getImplementationQueue(),
   ]);
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    year:    "numeric",
+    month:   "long",
+    day:     "numeric",
   });
 
   return (
@@ -86,17 +86,13 @@ export default async function DashboardPage() {
       <PageHeader
         eyebrow={today}
         title="Dashboard"
-        subtitle={
-          operator
-            ? `${operator.name} · Homebase`
-            : "Your operator console"
-        }
+        subtitle={operator ? `${operator.name} · Homebase` : "Your operator console"}
       />
 
-      {/* Row 1 — Status: Mission dominates, then Command + Money */}
+      {/* Row 1 — Scoreboard · Command · Money */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 xl:col-span-5">
-          <TodaysMission mission={mission} />
+          <DailyScoreboard entries={scoreboardEntries} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-3">
           <DailyCommand tasks={todayTasks} />
@@ -106,7 +102,7 @@ export default async function DashboardPage() {
         </div>
       </SectionGrid>
 
-      {/* Row 2 — Risk + Calendar + Output Tracker */}
+      {/* Row 2 — Risk · Calendar · Output */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
           <RiskAlerts alerts={alerts} />
@@ -119,7 +115,7 @@ export default async function DashboardPage() {
         </div>
       </SectionGrid>
 
-      {/* Row 3 — Execution: Goals + Projects + Bottlenecks */}
+      {/* Row 3 — Goals · Projects · Bottlenecks */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
           <ActiveGoals goals={goals} />
@@ -132,7 +128,7 @@ export default async function DashboardPage() {
         </div>
       </SectionGrid>
 
-      {/* Row 4 — Week + Closeout + Runway/Scores */}
+      {/* Row 4 — Weekly · Closeout · Runway + Scores */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 xl:col-span-5">
           <WeeklyWarRoom review={weeklyReview} />
@@ -144,15 +140,15 @@ export default async function DashboardPage() {
           <MoneyRunway money={money} />
           <div className="grid grid-cols-2 gap-4">
             <ExecutionScore score={operator?.executionScore} />
-            <FocusScore score={operator?.focusScore} />
+            <FocusScore     score={operator?.focusScore} />
           </div>
         </div>
       </SectionGrid>
 
-      {/* Row 5 — Queues */}
+      {/* Row 5 — Implementation Queue · Decisions · Kill List */}
       <SectionGrid className="mb-5">
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
-          <OpportunityQueue opportunities={opportunities} />
+          <ImplementationQueue items={implQueue} />
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-4">
           <DecisionLog decisions={decisions} />
@@ -162,7 +158,7 @@ export default async function DashboardPage() {
         </div>
       </SectionGrid>
 
-      {/* Row 6 — Agent Approval Center (full width) */}
+      {/* Row 6 — Agent Approval Center */}
       <div>
         <AgentApprovalCenter initialTasks={agentTasks} />
       </div>
