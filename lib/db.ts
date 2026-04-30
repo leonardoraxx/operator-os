@@ -351,7 +351,7 @@ export async function getKillItems(): Promise<KillItem[]> {
   }));
 }
 
-// ── Today's Mission — no missions table, returns null ────────────────
+// ── Today's Mission — missions table not yet provisioned ─────────────
 export async function getTodaysMission(): Promise<Mission | null> {
   return null;
 }
@@ -385,7 +385,7 @@ export async function getDecisions(): Promise<Decision[]> {
   }));
 }
 
-// ── Opportunities — table does not exist, returns empty ──────────────
+// ── Opportunities — not yet provisioned ─────────────────────────────
 export async function getOpportunities(): Promise<Opportunity[]> {
   return [];
 }
@@ -622,7 +622,9 @@ export async function getMoneyData(): Promise<MoneyData> {
   };
 }
 
-// ── Agent Recommendations (re-export) ────────────────────────────────
+// ── Agent Recommendations (extended) ─────────────────────────────────
+// Real columns: id, agent_name, recommendation, confidence_score, risk_level,
+//               expected_upside, required_action, status, source, linked_*, metadata
 export interface AgentRecommendation {
   id: string;
   title: string;

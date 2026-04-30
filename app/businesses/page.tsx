@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Building2, ArrowRight, AlertTriangle, TrendingUp } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";

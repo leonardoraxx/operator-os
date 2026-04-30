@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { CheckSquare } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { PageContainer } from "@/components/shell/page-container";

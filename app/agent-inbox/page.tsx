@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getAgentTasks } from "@/lib/db";
 import { AgentInboxClient } from "./agent-inbox-client";
 

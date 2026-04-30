@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { PageContainer } from "@/components/shell/page-container";
 import { SectionGrid } from "@/components/shell/section-grid";
 import { PageHeader } from "@/components/shell/page-header";
