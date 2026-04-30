@@ -21,7 +21,7 @@ export function RiskAlerts({ alerts = [] }: Props) {
   const items: DataListItem[] = data.map((alert) => {
     const Icon = CATEGORY_ICON[alert.category] ?? AlertTriangle;
     const tone =
-      alert.level === "high" || alert.level === "elevated" ? "danger" : "warning";
+      alert.level === "critical" || alert.level === "high" || alert.level === "elevated" ? "danger" : "warning";
     return {
       id: alert.id,
       icon: Icon,

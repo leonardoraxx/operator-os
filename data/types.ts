@@ -1,6 +1,6 @@
 // ── Core enums ────────────────────────────────────────────────
 export type StatusType = "on-track" | "at-risk" | "behind" | "done" | "paused" | "in-progress";
-export type RiskLevel = "low" | "medium" | "high" | "elevated";
+export type RiskLevel = "low" | "medium" | "high" | "elevated" | "critical";
 export type Priority = "critical" | "high" | "medium" | "low";
 export type Category =
   | "business"

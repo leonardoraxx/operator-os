@@ -40,6 +40,12 @@ const RISK_CONFIG: Record<RiskLevel, RiskConfig | null> = {
     bg: "var(--status-danger-bg)",
     text: "var(--status-danger)",
   },
+  critical: {
+    label: "Critical",
+    dot: "var(--status-danger)",
+    bg: "var(--status-danger-bg)",
+    text: "var(--status-danger)",
+  },
 };
 
 export function RiskBadge({ level, size = "md", className }: RiskBadgeProps) {

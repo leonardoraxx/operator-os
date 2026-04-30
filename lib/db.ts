@@ -48,26 +48,22 @@ export async function getOperator(): Promise<Operator | null> {
       () =>
         supabaseServer
           .from("daily_reviews")
-          .select("review_date, focus_score, execution_score")
+          // focus_score column does not exist in this DB; only execution_score
+          .select("review_date, execution_score")
           .order("review_date", { ascending: false })
           .limit(7),
-      [] as Array<{ review_date: string; focus_score: number | null; execution_score: number | null }>
+      [] as Array<{ review_date: string; execution_score: number | null }>
     ),
   ]);
 
   if (!profile) return null;
 
   // Build sparklines from last 7 days of daily_reviews (oldest→newest)
-  const sorted = [...reviews].reverse();
-  const focusSpark = sorted.map((r) => r.focus_score ?? 0);
-  const execSpark  = sorted.map((r) => r.execution_score ?? 0);
-  const latest     = reviews[0]; // most recent
+  const sorted   = [...reviews].reverse();
+  const execSpark = sorted.map((r) => r.execution_score ?? 0);
+  const latest    = reviews[0]; // most recent
 
-  const focusValue = latest?.focus_score     ?? 0;
   const execValue  = latest?.execution_score ?? 0;
-  const focusDelta = focusSpark.length > 1
-    ? focusSpark[focusSpark.length - 1] - focusSpark[focusSpark.length - 2]
-    : 0;
   const execDelta  = execSpark.length > 1
     ? execSpark[execSpark.length - 1] - execSpark[execSpark.length - 2]
     : 0;
@@ -76,10 +72,11 @@ export async function getOperator(): Promise<Operator | null> {
     name:   profile.name,
     handle: profile.alias ?? "",
     role:   profile.primary_focus ?? "",
+    // No focus_score column exists; mirror execution score
     focusScore: {
-      value:     focusValue,
-      delta:     focusDelta,
-      sparkline: focusSpark,
+      value:     execValue,
+      delta:     execDelta,
+      sparkline: execSpark,
       label:     "Focus Score",
     },
     executionScore: {
@@ -141,6 +138,17 @@ type GoalRow = {
   next_action: string | null;
 };
 
+function mapGoalStatus(s: string): Goal["status"] {
+  // DB uses "active" — map to frontend StatusType values
+  if (s === "active" || s === "on-track") return "on-track";
+  if (s === "at_risk" || s === "at-risk")  return "at-risk";
+  if (s === "behind")                       return "behind";
+  if (s === "done" || s === "completed")    return "done";
+  if (s === "paused")                       return "paused";
+  if (s === "in-progress" || s === "in_progress") return "in-progress";
+  return "on-track"; // safe default
+}
+
 function mapGoal(r: GoalRow): Goal {
   return {
     id:         r.id,
@@ -151,7 +159,7 @@ function mapGoal(r: GoalRow): Goal {
     current:    Number(r.current_value ?? 0),
     unit:       r.unit ?? "",
     deadline:   r.deadline ?? "",
-    status:     r.status   as Goal["status"],
+    status:     mapGoalStatus(r.status),
     priority:   r.priority as Goal["priority"],
     risk:       r.risk_level  ?? undefined,
     nextAction: r.next_action ?? undefined,
