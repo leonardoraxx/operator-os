@@ -584,13 +584,21 @@ export async function getSystemHealth(): Promise<SystemHealth | null> {
   };
 }
 
-// ── Content Pipeline — table exists, currently empty ─────────────────
+// ── Content Pipeline ────────────────────────────────────────���────────
+// Confirmed columns: id, idea, hook, script_status (default "idea"),
+//   video_type, platform, posted, views, lesson, created_at, updated_at
+// Pipeline stages: idea → scripted → filmed → edited → posted
 export interface ContentPipelineItem {
-  id:       string;
-  title:    string;
-  platform: string;
-  status:   string;
-  notes:    string | null;
+  id:           string;
+  idea:         string;
+  hook:         string;
+  scriptStatus: string;   // "idea" | "scripted" | "filmed" | "edited" | "posted"
+  videoType:    string | null;
+  platform:     string;
+  posted:       boolean;
+  views:        number;
+  lesson:       string;
+  createdAt:    string;
 }
 
 export async function getContentPipeline(): Promise<ContentPipelineItem[]> {
@@ -598,17 +606,22 @@ export async function getContentPipeline(): Promise<ContentPipelineItem[]> {
     () =>
       supabaseServer
         .from("content_pipeline")
-        .select("*")
+        .select("id,idea,hook,script_status,video_type,platform,posted,views,lesson,created_at")
         .order("created_at", { ascending: false })
-        .limit(20),
+        .limit(100),
     [] as Record<string, unknown>[]
   );
   return rows.map((r) => ({
-    id:       String(r.id       ?? ""),
-    title:    String(r.title    ?? r.name ?? ""),
-    platform: String(r.platform ?? ""),
-    status:   String(r.status   ?? ""),
-    notes:    r.notes ? String(r.notes) : null,
+    id:           String(r.id            ?? ""),
+    idea:         String(r.idea          ?? ""),
+    hook:         String(r.hook          ?? ""),
+    scriptStatus: String(r.script_status ?? "idea"),
+    videoType:    r.video_type ? String(r.video_type) : null,
+    platform:     String(r.platform      ?? ""),
+    posted:       Boolean(r.posted),
+    views:        Number(r.views         ?? 0),
+    lesson:       String(r.lesson        ?? ""),
+    createdAt:    String(r.created_at    ?? ""),
   }));
 }
 
