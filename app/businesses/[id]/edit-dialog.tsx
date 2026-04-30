@@ -74,8 +74,11 @@ export function EditBusinessDialog({ business }: Props) {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0" style={{ background: "rgba(0,0,0,0.6)", zIndex: 900 }} />
         <Dialog.Content
-          className="fixed top-1/2 left-1/2 w-full max-w-lg rounded-[var(--radius-card)] p-6 outline-none overflow-y-auto"
+          className="w-full max-w-lg rounded-[var(--radius-card)] p-6 outline-none overflow-y-auto"
           style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
             transform: "translate(-50%, -50%)",
             maxHeight: "90vh",
             background: "var(--bg-glass-elevated)",

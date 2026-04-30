@@ -3,6 +3,7 @@
 import { AlertTriangle, Moon, Activity, DollarSign, TrendingDown } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
 import { RiskBadge } from "@/components/primitives/risk-badge";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import type { DataListItem } from "@/components/primitives/data-list";
 import type { RiskAlert } from "@/data/types";
 
@@ -43,7 +44,7 @@ export function RiskAlerts({ alerts = [] }: Props) {
       pill={{ label: `${data.length}`, color: "danger" }}
       items={items}
       density="comfortable"
-      footer="View all →"
+      footer={<CardFooterLink href="/agent-inbox" label="View all →" />}
     />
   );
 }

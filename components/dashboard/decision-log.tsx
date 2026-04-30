@@ -39,7 +39,7 @@ export function DecisionLog({ decisions }: Props) {
       title="Decision Log"
       icon={GitBranch}
       items={items}
-      footer="View all decisions →"
+      footer={undefined}
     />
   );
 }

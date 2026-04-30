@@ -3,6 +3,7 @@
 import { AlertCircle } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
 import { RiskBadge } from "@/components/primitives/risk-badge";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import { formatDate } from "@/lib/format";
 import type { DataListItem } from "@/components/primitives/data-list";
 import type { ContextEntry } from "@/lib/db";
@@ -47,7 +48,7 @@ export function BottleneckDetector({ bottlenecks }: Props) {
       pill={{ label: bottlenecks.length > 6 ? `${sorted.length} of ${bottlenecks.length}` : `${bottlenecks.length}`, color: "warning" }}
       items={items}
       density="comfortable"
-      footer="View all →"
+      footer={<CardFooterLink href="/projects" label="View all →" />}
     />
   );
 }

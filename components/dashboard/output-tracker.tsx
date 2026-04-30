@@ -2,6 +2,7 @@
 
 import { Zap, Video, Mail, CheckSquare, MessageSquare, Phone, FileText, Activity } from "lucide-react";
 import { ListSection } from "@/components/primitives/list-section";
+import { CardFooterLink } from "@/components/primitives/card-footer-link";
 import { formatRelative } from "@/lib/format";
 import type { DataListItem } from "@/components/primitives/data-list";
 import type { ActivityEntry } from "@/lib/db";
@@ -45,7 +46,7 @@ export function OutputTracker({ activities }: Props) {
       icon={Zap}
       pill={{ label: `${activities.length} logged`, color: "neutral" }}
       items={items}
-      footer="View all output →"
+      footer={<CardFooterLink href="/reviews" label="View all output →" />}
     />
   );
 }

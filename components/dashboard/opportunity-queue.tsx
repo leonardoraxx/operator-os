@@ -28,7 +28,7 @@ export function OpportunityQueue({ opportunities }: Props) {
       title="Opportunity Queue"
       icon={Lightbulb}
       items={items}
-      footer="View all opportunities →"
+      footer={undefined}
     />
   );
 }

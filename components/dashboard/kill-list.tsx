@@ -23,7 +23,7 @@ export function KillList({ items: propItems = [] }: Props) {
       title="Kill List"
       icon={Trash2}
       items={items}
-      footer="Manage kill list →"
+      footer={undefined}
     />
   );
 }
